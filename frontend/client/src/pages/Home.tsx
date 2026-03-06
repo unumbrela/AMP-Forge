@@ -1,5 +1,5 @@
 /**
- * AMP Research Report - Academic Journal Style
+ * AMP Forge - Project Overview + Research Report
  * Design: Swiss International Style + Academic Publishing
  * Color: Warm white (#FAFAF5) + Charcoal (#1A1A2E) + Coral (#E8634A)
  * Typography: Playfair Display (headings) + Source Sans 3 (body) + Fira Code (code)
@@ -21,17 +21,24 @@ import {
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
-  LineChart, Line, AreaChart, Area,
+  AreaChart, Area,
 } from "recharts";
 import {
-  ExternalLink, Github, BookOpen, FlaskConical, Cpu, ArrowRight, ChevronDown,
-  Star, Database, Beaker, Code2, FileText, Layers, Zap, Target, Shield,
+  ExternalLink, Github, BookOpen, Cpu, ArrowRight, ChevronDown,
+  Star, Database, Code2, FileText, Layers, Zap, Target, Shield,
 } from "lucide-react";
 
 const HERO_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663390962009/nwNByvtJSze5gMGiNTNhXC/hero-amp-structure-gJSYNxhRQsz5bcnvnQNtBP.webp";
 const MODELS_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663390962009/nwNByvtJSze5gMGiNTNhXC/generation-models-imLzwiPRbyJQnYUeagQ5pB.webp";
 const EVAL_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663390962009/nwNByvtJSze5gMGiNTNhXC/evaluation-pipeline-CkDvrw87vYQELZsHzvSFE7.webp";
 const BG_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663390962009/nwNByvtJSze5gMGiNTNhXC/abstract-peptide-bg-7vmSS9d64cv7cVh5spxu7y.webp";
+
+const PROJECT_METRICS = [
+  { label: "已整合序列", value: "28,536", note: "AMP 64.2% / 非AMP 35.8%" },
+  { label: "训练阶段", value: "3-Phase", note: "VAE → RL 微调 → Latent Diffusion" },
+  { label: "变体模式", value: "5", note: "c_sub / c_ext / c_trunc / tag / latent" },
+  { label: "评估维度", value: "多维", note: "活性 / 安全性 / 多样性 / 新颖性" },
+];
 
 // Section wrapper with animation
 function Section({ children, id, className = "" }: { children: React.ReactNode; id: string; className?: string }) {
@@ -66,7 +73,7 @@ function NavBar() {
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 60);
-      const sections = ["hero", "abstract", "models", "evaluation", "repos", "timeline", "implementation", "references"];
+      const sections = ["hero", "project", "abstract", "models", "evaluation", "repos", "timeline", "implementation", "references"];
       for (const s of sections.reverse()) {
         const el = document.getElementById(s);
         if (el && el.getBoundingClientRect().top < 200) {
@@ -80,19 +87,20 @@ function NavBar() {
   }, []);
 
   const navItems = [
-    { id: "abstract", label: "摘要" },
+    { id: "project", label: "项目概览" },
+    { id: "abstract", label: "研究背景" },
     { id: "models", label: "生成模型" },
-    { id: "evaluation", label: "评估方法" },
-    { id: "repos", label: "开源项目" },
+    { id: "evaluation", label: "评估体系" },
+    { id: "repos", label: "开源生态" },
     { id: "timeline", label: "发展脉络" },
-    { id: "implementation", label: "实现指南" },
+    { id: "implementation", label: "落地指南" },
   ];
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/95 backdrop-blur-sm shadow-sm border-b border-border" : ""}`}>
       <div className="container flex items-center justify-between h-14">
         <a href="#hero" className="font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight text-foreground hover:text-primary transition-colors">
-          AMP Research
+          AMP Forge
         </a>
         <div className="hidden md:flex items-center gap-1">
           {navItems.map((item) => (
@@ -130,7 +138,7 @@ function HeroSection() {
             transition={{ delay: 0.2 }}
             className="text-sm uppercase tracking-[0.2em] text-primary font-medium mb-6"
           >
-            深度调研报告 · 2026
+            AMP Forge · 项目介绍与技术调研 · 2026
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
@@ -138,9 +146,9 @@ function HeroSection() {
             transition={{ delay: 0.4, duration: 0.8 }}
             className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-8 text-foreground"
           >
-            抗菌肽生成技术
+            AMP Forge
             <br />
-            <span className="text-primary">深度研究与实现指南</span>
+            <span className="text-primary">抗菌肽生成项目介绍与研究综述</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -148,8 +156,9 @@ function HeroSection() {
             transition={{ delay: 0.6 }}
             className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mb-10"
           >
-            系统梳理近年来基于深度学习的抗菌肽（AMP）生成、评估与优化技术前沿，
-            涵盖VAE、GAN、扩散模型、LLM等主流架构，以及MIC预测、溶血性评估等关键工具。
+            本页面在保留调研主体内容的基础上，扩展为 AMP Forge 项目介绍页面：
+            覆盖数据构建、模型训练、序列生成、评估验证与工程化落地，
+            同时呈现 VAE、GAN、扩散模型、LLM 等主流技术的对比与演进。
           </motion.p>
           <motion.div
             initial={{ opacity: 0 }}
@@ -158,16 +167,16 @@ function HeroSection() {
             className="flex flex-wrap gap-3 text-sm text-muted-foreground"
           >
             <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary">
-              <BookOpen className="w-3.5 h-3.5" /> 20+ 论文调研
+              <BookOpen className="w-3.5 h-3.5" /> 项目 + 调研双轨内容
             </span>
             <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary">
-              <Github className="w-3.5 h-3.5" /> 7+ 开源项目
+              <Database className="w-3.5 h-3.5" /> 2.8万+ 数据规模
             </span>
             <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary">
-              <FlaskConical className="w-3.5 h-3.5" /> 10+ 评估工具
+              <Layers className="w-3.5 h-3.5" /> ESM + VAE + Diffusion
             </span>
             <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary">
-              <Cpu className="w-3.5 h-3.5" /> 6 步实现方案
+              <Cpu className="w-3.5 h-3.5" /> 训练-生成-评估闭环
             </span>
           </motion.div>
         </div>
@@ -184,6 +193,100 @@ function HeroSection() {
   );
 }
 
+function ProjectSection() {
+  return (
+    <Section id="project">
+      <div className="container">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
+          <div className="lg:col-span-8">
+            <div className="flex items-start mb-8">
+              <SectionNumber num="01." />
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-2">项目概览</h2>
+                <p className="text-muted-foreground text-lg mt-3">从调研走向工程：AMP Forge 的真实实现路径</p>
+                <div className="w-16 h-0.5 bg-primary mt-3" />
+              </div>
+            </div>
+            <div className="prose-academic">
+              <p>
+                AMP Forge 是一个面向抗菌肽设计的完整工程项目。页面内容从“纯调研报告”拓展为“项目介绍 + 调研沉淀”，
+                目标是把研究结论转化为可复现的训练、生成与评估流水线。
+              </p>
+              <p>
+                核心模型采用 ESM 表征 + VAE + 潜在扩散（Latent Diffusion）框架，并提供无条件生成与母序列变体设计两条主路径。
+                在工程层面，项目包含数据构建脚本、三阶段训练脚本、生成脚本与评估脚本，支持持续迭代。
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+              <div className="bg-card rounded-lg border border-border p-5">
+                <p className="text-sm uppercase tracking-wider text-muted-foreground mb-2">Core Stack</p>
+                <p className="font-semibold mb-2 flex items-center gap-2"><Layers className="w-4 h-4 text-primary" /> ESM-DiffVAE v8</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  多后端 PLM 特征提取、BiGRU 编码、非自回归 Transformer 解码与潜空间扩散采样。
+                </p>
+              </div>
+              <div className="bg-card rounded-lg border border-border p-5">
+                <p className="text-sm uppercase tracking-wider text-muted-foreground mb-2">Generation Focus</p>
+                <p className="font-semibold mb-2 flex items-center gap-2"><Zap className="w-4 h-4 text-primary" /> 从头生成 + 可控变体</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  支持 mixed / c_sub / c_ext / c_trunc / tag / latent 等模式，兼顾创新性与可控性。
+                </p>
+              </div>
+              <div className="bg-card rounded-lg border border-border p-5">
+                <p className="text-sm uppercase tracking-wider text-muted-foreground mb-2">Evaluation</p>
+                <p className="font-semibold mb-2 flex items-center gap-2"><Target className="w-4 h-4 text-primary" /> 多维评估体系</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  覆盖序列统计、多样性、新颖性、理化性质与变体同一性分布，形成可比较的实验输出。
+                </p>
+              </div>
+              <div className="bg-card rounded-lg border border-border p-5">
+                <p className="text-sm uppercase tracking-wider text-muted-foreground mb-2">Engineering</p>
+                <p className="font-semibold mb-2 flex items-center gap-2"><Shield className="w-4 h-4 text-primary" /> 可复现与可维护</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  提供脚本化流程、日志、配置化参数与大文件隔离策略，支持长期演进与协作开发。
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                href="https://github.com/unumbrela/amp-research2"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+              >
+                <Github className="w-4 h-4" /> 项目仓库 <ArrowRight className="w-4 h-4" />
+              </a>
+              <a
+                href="#implementation"
+                className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-md border border-border hover:border-primary/40 hover:bg-card transition-colors"
+              >
+                <FileText className="w-4 h-4" /> 查看落地流程
+              </a>
+            </div>
+          </div>
+
+          <div className="lg:col-span-4 space-y-4 lg:pt-24">
+            {PROJECT_METRICS.map((metric) => (
+              <div key={metric.label} className="annotation-card">
+                <p className="font-medium text-foreground mb-1">{metric.label}</p>
+                <p>
+                  <strong className="text-primary">{metric.value}</strong> · {metric.note}
+                </p>
+              </div>
+            ))}
+            <div className="annotation-card">
+              <p className="font-medium text-foreground mb-1">页面定位</p>
+              <p>保留调研主干内容，同时强化“AMP Forge 项目本体”的方法、成果和扩展方向。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
 // Abstract Section
 function AbstractSection() {
   return (
@@ -192,13 +295,17 @@ function AbstractSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
           <div className="lg:col-span-8">
             <div className="flex items-start mb-8">
-              <SectionNumber num="01." />
+              <SectionNumber num="02." />
               <div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-2">摘要与背景</h2>
+                <h2 className="text-3xl md:text-4xl font-bold mb-2">研究背景与调研摘要</h2>
                 <div className="w-16 h-0.5 bg-primary mt-3" />
               </div>
             </div>
             <div className="prose-academic">
+              <p>
+                为了支撑 AMP Forge 的模型设计与评估标准，本项目系统梳理了抗菌肽计算设计领域的核心问题、主流技术路线与关键验证指标。
+                下述调研内容是项目实现策略的理论基础。
+              </p>
               <p>
                 随着抗生素耐药性问题日益严峻，抗菌肽（Antimicrobial Peptides, AMPs）作为传统抗生素的潜在替代品，受到了广泛关注。据估计，2019年全球有近495万例死亡与细菌抗微生物药物耐药性（AMR）有关，其中包括127万例可直接归因于细菌AMR的死亡。这一严峻形势推动了新型抗菌策略的研究。
               </p>
@@ -217,6 +324,10 @@ function AbstractSection() {
             </div>
           </div>
           <div className="lg:col-span-4 space-y-6 lg:pt-24">
+            <div className="annotation-card">
+              <p className="font-medium text-foreground mb-1">项目数据规模</p>
+              <p>当前整合数据达到<strong className="text-primary">28,536</strong>条序列，用于训练与评估</p>
+            </div>
             <div className="annotation-card">
               <p className="font-medium text-foreground mb-1">关键数字</p>
               <p>全球每年约<strong className="text-primary">495万</strong>例死亡与细菌AMR有关</p>
@@ -246,7 +357,7 @@ function ModelsSection() {
     <Section id="models" className="bg-secondary/30">
       <div className="container">
         <div className="flex items-start mb-12">
-          <SectionNumber num="02." />
+          <SectionNumber num="03." />
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">生成模型</h2>
             <p className="text-muted-foreground text-lg mt-3">从VAE到LLM：AMP生成技术的演进</p>
@@ -404,7 +515,7 @@ function EvaluationSection() {
     <Section id="evaluation">
       <div className="container">
         <div className="flex items-start mb-12">
-          <SectionNumber num="03." />
+          <SectionNumber num="04." />
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">评估方法与工具</h2>
             <p className="text-muted-foreground text-lg mt-3">从物理化学性质到MIC预测的多维度评估体系</p>
@@ -544,7 +655,7 @@ function ReposSection() {
     <Section id="repos" className="bg-secondary/30">
       <div className="container">
         <div className="flex items-start mb-12">
-          <SectionNumber num="04." />
+          <SectionNumber num="05." />
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">开源项目</h2>
             <p className="text-muted-foreground text-lg mt-3">可直接复用的GitHub代码仓库</p>
@@ -605,7 +716,7 @@ function TimelineSection() {
     <Section id="timeline">
       <div className="container">
         <div className="flex items-start mb-12">
-          <SectionNumber num="05." />
+          <SectionNumber num="06." />
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">发展脉络</h2>
             <p className="text-muted-foreground text-lg mt-3">AMP计算设计领域的关键里程碑</p>
@@ -663,7 +774,7 @@ function ImplementationSection() {
     <Section id="implementation" className="bg-secondary/30">
       <div className="container">
         <div className="flex items-start mb-12">
-          <SectionNumber num="06." />
+          <SectionNumber num="07." />
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">实现指南</h2>
             <p className="text-muted-foreground text-lg mt-3">从零开始构建AMP生成与评估系统的分步指南</p>
@@ -760,7 +871,7 @@ function ReferencesSection() {
     <Section id="references">
       <div className="container">
         <div className="flex items-start mb-12">
-          <SectionNumber num="07." />
+          <SectionNumber num="08." />
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">参考文献</h2>
             <div className="w-16 h-0.5 bg-primary mt-3" />
@@ -799,11 +910,11 @@ function Footer() {
       <div className="container">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-center md:text-left">
-            <p className="font-[family-name:var(--font-display)] text-lg font-semibold">AMP Research Report</p>
-            <p className="text-sm text-muted-foreground mt-1">抗菌肽生成技术深度研究与实现指南 · 2026</p>
+            <p className="font-[family-name:var(--font-display)] text-lg font-semibold">AMP Forge</p>
+            <p className="text-sm text-muted-foreground mt-1">抗菌肽生成项目介绍与研究综述 · 2026</p>
           </div>
           <p className="text-xs text-muted-foreground">
-            由 Manus AI 调研并生成 · 数据截至 2026年2月
+            项目导向页面：研究调研、工程实现与扩展路线统一呈现
           </p>
         </div>
       </div>
@@ -817,6 +928,7 @@ export default function Home() {
     <div className="min-h-screen">
       <NavBar />
       <HeroSection />
+      <ProjectSection />
       <AbstractSection />
       <ModelsSection />
       <EvaluationSection />
