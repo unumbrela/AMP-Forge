@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+title: "AMP Forge"
+message: "If you use this project in your research, please cite it as follows."
+type: software
+authors:
+  - name: "unumbrela"
+repository-code: "https://github.com/unumbrela/amp-research2"
+url: "https://github.com/unumbrela/amp-research2"
+abstract: "AMP Forge is an antimicrobial peptide generation project based on PLM embeddings, VAE, and latent diffusion."
+keywords:
+  - antimicrobial peptides
+  - protein language model
+  - variational autoencoder
+  - latent diffusion
+license: "NOASSERTION"

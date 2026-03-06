@@ -123,3 +123,6 @@ __pycache__/
 
 # Local notes / scratch
 /日志
+
+# Local duplicate processed dataset copy
+esm_diffvae/data/processed copy/
