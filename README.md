@@ -23,6 +23,7 @@ AMP Forge is a de novo antimicrobial peptide (AMP) design platform built on a jo
 
 ## Key Features
 
+- **Cross-database AMP corpus** — consolidated 6 major sources into a curated 25,622-sequence dataset covering nearly all publicly accessible AMP collections we could obtain.
 - **Multi-PLM backbone** — unified interface over ESM-2, ProtT5, and Ankh; pre-computed embeddings avoid training-time bottleneck.
 - **Latent diffusion generation** — 50-step Gaussian diffusion in a 64-dim latent space with classifier-free guidance (CFG), balancing sample diversity and quality.
 - **Non-autoregressive decoding** — parallel prediction of all residue positions eliminates exposure bias and error accumulation.
