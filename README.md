@@ -11,54 +11,55 @@
 [![pnpm](https://img.shields.io/badge/pnpm-10-F69220?logo=pnpm&logoColor=white)](./frontend/package.json)
 [![GitHub Pages](https://img.shields.io/badge/Demo-GitHub%20Pages-222222?logo=github&logoColor=white)](https://unumbrela.github.io/AMP-Forge/)
 
-AMP Forge is an antimicrobial peptide (AMP) generation and project-showcase repository built around a practical, extensible workflow for:
-
-- de novo AMP generation,
-- controlled variant design from parent sequences,
-- model training and evaluation with reproducible scripts.
+AMP Forge is a de novo antimicrobial peptide (AMP) design platform built on a joint **Transformer-based VAE + Latent Diffusion Model** architecture. The system leverages pre-trained protein language models (ESM-2 / ProtT5 / Ankh) to extract deep sequence-level representations, compresses them into a low-dimensional latent space via a BiGRU encoder, and employs a latent diffusion process coupled with a non-autoregressive Transformer decoder for parallel sequence generation. Six conditional generation modes — `mixed`, `c_sub`, `c_ext`, `c_trunc`, `tag`, and `latent` — enable precise and controllable AMP variant design.
 
 ## Live Demo
 
-- Repository: [https://github.com/unumbrela/AMP-Forge](https://github.com/unumbrela/AMP-Forge)
-- Project page: [https://unumbrela.github.io/AMP-Forge/](https://unumbrela.github.io/AMP-Forge/)
-
-## Quick Links
-
-- Project summary: [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md)
-- Data collection report: [DATA_COLLECTION_REPORT.md](./DATA_COLLECTION_REPORT.md)
-- Core model package: [esm_diffvae/](./esm_diffvae)
-- Frontend package: [frontend/](./frontend)
+| | |
+|---|---|
+| **Repository** | [github.com/unumbrela/AMP-Forge](https://github.com/unumbrela/AMP-Forge) |
+| **Project Page** | [unumbrela.github.io/AMP-Forge](https://unumbrela.github.io/AMP-Forge/) |
+| **Docs** | [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md) · [DATA_COLLECTION_REPORT.md](./DATA_COLLECTION_REPORT.md) |
 
 ## Key Features
 
-- Unified architecture: PLM embeddings + VAE + latent diffusion.
-- Non-autoregressive decoding for parallel sequence generation.
-- Conditional variant modes: `mixed`, `c_sub`, `c_ext`, `c_trunc`, `tag`, `latent`.
-- End-to-end scripts for data prep, training, generation, and evaluation.
+- **Multi-PLM backbone** — unified interface over ESM-2, ProtT5, and Ankh; pre-computed embeddings avoid training-time bottleneck.
+- **Latent diffusion generation** — 50-step Gaussian diffusion in a 64-dim latent space with classifier-free guidance (CFG), balancing sample diversity and quality.
+- **Non-autoregressive decoding** — parallel prediction of all residue positions eliminates exposure bias and error accumulation.
+- **6 conditional variant modes** — C-terminal substitution / extension / truncation-rebuild, tag appending, latent perturbation, and mixed stochastic sampling.
+- **3-phase training pipeline** — VAE MLE pre-training → RL adversarial fine-tuning → latent diffusion training, with cyclical KL annealing + free-bits to prevent posterior collapse.
+- **End-to-end reproducibility** — data crawling, embedding computation, training, generation, and evaluation all scripted with a single YAML config and fixed random seeds.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    A[Input AMP sequence] --> B[PLM Extractor]
-    A --> C[AA Hybrid Encoding]
+    A[Input AMP Sequence] --> B["PLM Extractor\n(ESM-2 / ProtT5 / Ankh)"]
+    A --> C["AA Hybrid Encoding\n(BLOSUM62 + Learnable)"]
     B --> D[BiGRU Encoder]
     C --> D
-    D --> E[Latent z]
-    E --> F[Latent Diffusion]
-    F --> G[Non-AR Transformer Decoder]
-    G --> H[Generated AMP sequence]
+    D --> E["Latent z (64-dim)"]
+    E --> F["Latent Diffusion\n(T=50, Cosine, CFG)"]
+    E --> P["Property Heads\n(AMP / MIC / Tox / Hemo)"]
+    F --> G["Non-AR Transformer Decoder\n(3-layer, 4-head)"]
+    G --> H[Generated AMP Sequence]
 ```
 
 ## Repository Structure
 
 ```text
 .
-├── esm_diffvae/            # Core model, data, training, generation, evaluation
-├── frontend/               # GitHub Pages frontend
-├── PROJECT_SUMMARY.md      # Detailed technical summary
-├── DATA_COLLECTION_REPORT.md
-└── docs/                   # Bilingual docs and assets
+├── esm_diffvae/               # Core model — data, training, generation, evaluation
+│   ├── models/                #   Neural network components
+│   ├── training/              #   3-phase training scripts
+│   ├── generation/            #   Unconditional, variant, interpolation
+│   ├── evaluation/            #   Metrics, physicochemical, visualization
+│   ├── data/                  #   Crawling, cleaning, embedding computation
+│   └── configs/default.yaml   #   Global configuration
+├── frontend/                  # Interactive web UI (React + Three.js)
+├── docs/                      # Bilingual documentation (EN + ZH)
+├── PROJECT_SUMMARY.md         # Detailed technical summary
+└── DATA_COLLECTION_REPORT.md  # Data sources & pipeline report
 ```
 
 ## Getting Started

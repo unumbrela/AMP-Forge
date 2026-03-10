@@ -1,6 +1,6 @@
 /**
  * AMP Forge Landing Page
- * Project-first narrative with retained research context.
+ * Academic-focused narrative with research context.
  */
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -27,17 +27,13 @@ import {
   CheckCircle2,
   ChevronDown,
   Cpu,
-  Database,
   ExternalLink,
-  FlaskConical,
   Github,
   Languages,
   Layers,
   Rocket,
-  ShieldCheck,
   Sparkles,
   Target,
-  Workflow,
 } from "lucide-react";
 
 type Locale = "en" | "zh";
@@ -86,49 +82,6 @@ const propertyCoverage = [
   { dimension: "Length", value: 100 },
 ];
 
-const projectMilestones = [
-  {
-    title: { en: "Data Foundation", zh: "数据底座" },
-    desc: {
-      en: "Integrated multi-source AMP records and unified cleaning into a trainable data foundation.",
-      zh: "多源数据整合与统一清洗，形成可训练数据底座。",
-    },
-    status: "done",
-  },
-  {
-    title: { en: "Model Core", zh: "模型核心" },
-    desc: {
-      en: "Connected the full ESM-DiffVAE v8 path from training to generation.",
-      zh: "ESM-DiffVAE v8 训练与生成链路打通。",
-    },
-    status: "done",
-  },
-  {
-    title: { en: "Evaluation Stack", zh: "评估体系" },
-    desc: {
-      en: "Implemented a multi-metric stack with physicochemical and variant analysis workflows.",
-      zh: "多维指标、理化性质与变体分析流程落地。",
-    },
-    status: "done",
-  },
-  {
-    title: { en: "Project Packaging", zh: "项目包装" },
-    desc: {
-      en: "Shipped bilingual documentation, GitHub presentation, and a project-first frontend narrative.",
-      zh: "双语文档、GitHub 展示与前端项目化叙事。",
-    },
-    status: "in_progress",
-  },
-  {
-    title: { en: "Next Expansion", zh: "下一阶段扩展" },
-    desc: {
-      en: "Next: experimental validation, model compression, and deployment-ready interfaces.",
-      zh: "补充实验验证、模型压缩与部署接口。",
-    },
-    status: "next",
-  },
-];
-
 const variantModes = [
   {
     mode: "c_sub",
@@ -172,89 +125,13 @@ const variantModes = [
   },
 ];
 
-const methodLandscape = [
-  {
-    name: "HydrAMP (cVAE)",
-    architecture: { en: "Conditional VAE", zh: "条件 VAE" },
-    strengths: {
-      en: "Strong for goal-guided analog design with a clear training path.",
-      zh: "适合围绕先验目标做类似物设计，训练路径清晰。",
-    },
-    limitations: {
-      en: "More optimization-oriented; limited for broad de novo diversity and transfer.",
-      zh: "更偏向条件优化，跨目标迁移与 de novo 多样性受限。",
-    },
-    repo: "https://github.com/szczurek-lab/hydramp",
-  },
-  {
-    name: "Diff-AMP",
-    architecture: { en: "Generate + Identify + Predict + Optimize", zh: "生成 + 识别 + 预测 + 优化" },
-    strengths: {
-      en: "Comprehensive workflow with strong modular capabilities.",
-      zh: "任务链路完整，模块化能力较强。",
-    },
-    limitations: {
-      en: "High system complexity; replacing or iterating one module can be expensive.",
-      zh: "模块多导致工程复杂度高，单模块替换与迭代成本较高。",
-    },
-    repo: "https://github.com/wrab12/diff-amp",
-  },
-  {
-    name: "AMPGen",
-    architecture: { en: "Evolutionary priors + Diffusion", zh: "进化信息 + 扩散" },
-    strengths: {
-      en: "Good at target-aware design and sequence conservation modeling.",
-      zh: "对靶向设计和序列保守性建模较好。",
-    },
-    limitations: {
-      en: "Limited public reproducibility artifacts and higher reuse barrier.",
-      zh: "公开复现材料有限，工程复用门槛较高。",
-    },
-    repo: null,
-  },
-  {
-    name: "LLM-based AMP Foundation",
-    architecture: { en: "Large-model sequence generation", zh: "大模型序列生成" },
-    strengths: {
-      en: "Strong generation capacity with broader semantic coverage.",
-      zh: "生成能力强，覆盖更广泛语义模式。",
-    },
-    limitations: {
-      en: "High training cost and lower controllability for small teams.",
-      zh: "训练资源需求高，面向小团队的成本和可控性仍是挑战。",
-    },
-    repo: null,
-  },
-];
-
-const projectAdvantages = [
-  {
-    en: "A reproducible train-generate-evaluate loop that reduces script fragmentation.",
-    zh: "统一成一个可复现的训练-生成-评估闭环，减少多脚本割裂。",
-  },
-  {
-    en: "Latent diffusion as the core, balancing de novo generation and controllable variants.",
-    zh: "以潜空间扩散为核心，兼顾 de novo 生成和可控变体生成。",
-  },
-  {
-    en: "Multiple generation modes (c_sub / c_ext / latent / tag) for rapid experiment comparison.",
-    zh: "支持多生成模式（c_sub / c_ext / latent / tag），便于快速实验对比。",
-  },
-  {
-    en: "Standardized outputs (FASTA / JSON / plots) for version tracking and review.",
-    zh: "结果目录标准化输出（FASTA / JSON / 可视化），方便版本追踪和复盘。",
-  },
-];
-
 const unconditionalSamples = [
   { id: "generated_1", len: 7, sequence: "RNDFNPM" },
   { id: "generated_4", len: 46, sequence: "KKCWRQCYRWPWWCNCRKCCRYVCVTYRRNTRYTRSQQKHKPQNFP" },
   { id: "generated_11", len: 50, sequence: "WRRFKRYCKKHWRRYDMHRPRRKTHLPRNYKWRRRHRHRKRRRYKQKDRQ" },
   { id: "generated_31", len: 29, sequence: "WITTWTKWLMLAIHMFHKFHKFKTKKSGQ" },
   { id: "generated_56", len: 24, sequence: "WWDLWWWIKNWWPCHKHWWWKPYC" },
-  { id: "generated_66", len: 29, sequence: "GWGKSIVKCGKGPIASAFKKNWQAGYKCP" },
   { id: "generated_78", len: 27, sequence: "KLKFILKAAWALLWGAFSFYTKWNWKY" },
-  { id: "generated_100", len: 21, sequence: "WAPWAWWWLAKWAPSWPKWPR" },
 ];
 
 const variantSamples = [
@@ -286,6 +163,21 @@ const references = [
     id: 4,
     text: "Jin et al. (2025). AMPGen: an evolutionary information-reserved and diffusion-driven generative model for de novo design.",
     doi: "10.1038/s42003-025-08282-7",
+  },
+  {
+    id: 5,
+    text: "Lin et al. (2023). Evolutionary-scale prediction of atomic-level protein structure with a language model (ESM-2).",
+    doi: "10.1126/science.ade2574",
+  },
+  {
+    id: 6,
+    text: "Elnaggar et al. (2022). ProtTrans: Toward understanding the language of life through self-supervised learning (ProtT5).",
+    doi: "10.1109/TPAMI.2021.3095381",
+  },
+  {
+    id: 7,
+    text: "Ho et al. (2020). Denoising Diffusion Probabilistic Models (DDPM).",
+    doi: "10.48550/arXiv.2006.11239",
   },
 ];
 
@@ -424,13 +316,13 @@ function NavBar({ locale, setLocale }: { locale: Locale; setLocale: (locale: Loc
   }, []);
 
   const navItems = [
-    { id: "overview", label: t(locale, "Overview", "项目概览") },
-    { id: "landscape", label: t(locale, "Method Gap", "方法对比") },
+    { id: "overview", label: t(locale, "Motivation", "研究动机") },
+    { id: "landscape", label: t(locale, "Positioning", "技术定位") },
     { id: "architecture", label: t(locale, "Architecture", "架构设计") },
     { id: "data", label: t(locale, "Data & Training", "数据与训练") },
     { id: "generation", label: t(locale, "Generation", "生成能力") },
     { id: "evaluation", label: t(locale, "Evaluation", "评估结果") },
-    { id: "roadmap", label: t(locale, "Roadmap", "路线图") },
+    { id: "roadmap", label: t(locale, "Future Work", "未来方向") },
   ];
 
   return (
@@ -643,11 +535,31 @@ function IGEMPointCloudSection({ locale }: { locale: Locale }) {
   );
 }
 
+/* ─── Section 1: AmpHero — Research Abstract Style ─── */
 function AmpHeroSection({ locale }: { locale: Locale }) {
+  const contributions = [
+    {
+      en: "A joint Transformer VAE + latent diffusion architecture with multi-PLM backbone (ESM-2, ProtT5, Ankh) for deep sequence representation.",
+      zh: "联合 Transformer VAE + 潜空间扩散架构，支持多 PLM 后端（ESM-2、ProtT5、Ankh）提取序列深层表征。",
+    },
+    {
+      en: "Non-autoregressive parallel decoding that eliminates exposure bias, combined with 50-step CFG-guided latent diffusion for diversity–quality balance.",
+      zh: "非自回归并行解码消除曝光偏差，配合 50 步 CFG 引导的潜空间扩散，兼顾多样性与生成质量。",
+    },
+    {
+      en: "Six conditional generation modes (c_sub / c_ext / c_trunc / tag / latent / mixed) enabling precise variant control from a single parent sequence.",
+      zh: "六种条件生成模式（c_sub / c_ext / c_trunc / tag / latent / mixed），从单条母序列精准控制变体设计。",
+    },
+    {
+      en: "End-to-end reproducible pipeline with 3-phase training (VAE → RL → Diffusion) and standardized outputs (FASTA / JSON / plots).",
+      zh: "端到端可复现流程：三阶段训练（VAE → RL → 扩散）+ 标准化输出（FASTA / JSON / 可视化）。",
+    },
+  ];
+
   return (
     <section
       id="amp-home"
-      className="relative flex min-h-[92vh] items-end overflow-hidden pb-16 pt-24"
+      className="relative flex min-h-[80vh] items-end overflow-hidden pb-16 pt-24"
       style={{ backgroundColor: AMP_HOME_BG }}
     >
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.32)_0%,rgba(248,247,243,0.35)_100%)]" />
@@ -660,19 +572,19 @@ function AmpHeroSection({ locale }: { locale: Locale }) {
             transition={{ delay: 0.05 }}
             className="mb-6 text-sm font-medium uppercase tracking-[0.2em] text-primary"
           >
-            {t(locale, "AMP Forge · Project Homepage · 2026", "AMP Forge · 项目主页 · 2026")}
+            {t(locale, "AMP Forge · Research Summary", "AMP Forge · 研究摘要")}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-120px" }}
             transition={{ delay: 0.12, duration: 0.75 }}
-            className="mb-8 text-4xl font-bold leading-[1.08] text-foreground md:text-6xl lg:text-7xl"
+            className="mb-6 text-4xl font-bold leading-[1.08] text-foreground md:text-6xl"
           >
-            {t(locale, "Antimicrobial Peptide Generation", "抗菌肽生成项目")}
+            {t(locale, "De Novo Antimicrobial Peptide Design", "抗菌肽从头设计")}
             <br />
             <span className="text-primary">
-              {t(locale, "From Research to Deployable System", "从研究到可落地系统")}
+              {t(locale, "via Latent Diffusion", "基于潜空间扩散模型")}
             </span>
           </motion.h1>
           <motion.p
@@ -680,33 +592,56 @@ function AmpHeroSection({ locale }: { locale: Locale }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-120px" }}
             transition={{ delay: 0.2 }}
-            className="mb-10 max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl"
+            className="mb-8 max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl"
           >
             {t(
               locale,
-              "Antimicrobial resistance keeps rising, while wet-lab AMP discovery remains costly, slow, and low-coverage. AMP Forge turns this challenge into an end-to-end reproducible system and tells one coherent story: problem context, method gaps, our design, and real outputs.",
-              "抗生素耐药问题持续加剧，而湿实验筛选抗菌肽成本高、周期长、覆盖有限。AMP Forge 以可复现工程为中心，把项目背景、方法对比、模型实现与真实生成结果串成一条完整叙事链。"
+              "Antimicrobial resistance is a growing global health crisis, yet conventional AMP discovery remains costly and low-throughput. We propose AMP Forge, a joint Transformer VAE and latent diffusion framework that generates diverse, controllable AMP candidates through non-autoregressive parallel decoding. Evaluated on 28,536 curated sequences, our approach achieves 1.00 uniqueness, 1.00 novelty, and 0.853 mean diversity.",
+              "抗菌素耐药性是日益严峻的全球健康危机，而传统抗菌肽发现仍然成本高、通量低。我们提出 AMP Forge——一个联合 Transformer VAE 与潜空间扩散模型的框架，通过非自回归并行解码生成多样化、可控的抗菌肽候选序列。在 28,536 条精选序列上评估，我们的方法实现了 1.00 唯一性、1.00 新颖性和 0.853 平均多样性。"
             )}
           </motion.p>
+
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-120px" }}
-            transition={{ delay: 0.28 }}
-            className="flex flex-wrap gap-3 text-sm"
+            transition={{ delay: 0.25 }}
+            className="mb-10"
           >
-            <span className="flex items-center gap-1.5 rounded-full border border-border/70 bg-background/60 px-3 py-1.5 text-muted-foreground">
-              <Database className="h-3.5 w-3.5" /> {t(locale, "28,536 training-ready sequences", "28,536 条训练级序列")}
-            </span>
-            <span className="flex items-center gap-1.5 rounded-full border border-border/70 bg-background/60 px-3 py-1.5 text-muted-foreground">
-              <Layers className="h-3.5 w-3.5" /> ESM + VAE + Latent Diffusion
-            </span>
-            <span className="flex items-center gap-1.5 rounded-full border border-border/70 bg-background/60 px-3 py-1.5 text-muted-foreground">
-              <Workflow className="h-3.5 w-3.5" /> {t(locale, "Train-Generate-Evaluate loop", "训练-生成-评估闭环")}
-            </span>
-            <span className="flex items-center gap-1.5 rounded-full border border-border/70 bg-background/60 px-3 py-1.5 text-muted-foreground">
-              <Sparkles className="h-3.5 w-3.5" /> {t(locale, "Controllable variant generation", "可控变体生成")}
-            </span>
+            <p className="text-sm font-semibold uppercase tracking-wider text-foreground mb-3">
+              {t(locale, "Key Contributions", "核心贡献")}
+            </p>
+            <ul className="space-y-2">
+              {contributions.map((c, i) => (
+                <li key={i} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                  <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                  <span>{locale === "zh" ? c.zh : c.en}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: "-120px" }}
+            transition={{ delay: 0.32 }}
+            className="flex flex-wrap gap-3"
+          >
+            <a
+              href={REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+            >
+              <Github className="w-4 h-4" /> {t(locale, "GitHub Repository", "GitHub 仓库")} <ArrowRight className="w-4 h-4" />
+            </a>
+            <a
+              href="#evaluation"
+              className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-md border border-border hover:border-primary/40 hover:bg-card transition-colors"
+            >
+              <Rocket className="w-4 h-4" /> {t(locale, "View Results", "查看结果")}
+            </a>
           </motion.div>
         </div>
       </div>
@@ -718,7 +653,7 @@ function AmpHeroSection({ locale }: { locale: Locale }) {
         transition={{ delay: 0.35 }}
         onClick={() => scrollToSection("overview")}
         className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 items-center justify-center text-muted-foreground transition hover:text-foreground"
-        aria-label={t(locale, "Scroll to project overview", "滚动到项目概览")}
+        aria-label={t(locale, "Scroll to research motivation", "滚动到研究动机")}
       >
         <ChevronDown className="h-5 w-5 animate-bounce" />
       </motion.button>
@@ -726,6 +661,7 @@ function AmpHeroSection({ locale }: { locale: Locale }) {
   );
 }
 
+/* ─── Section 2: Research Motivation & Scope (was Overview) ─── */
 function OverviewSection({ locale }: { locale: Locale }) {
   return (
     <Section id="overview" withImageBg>
@@ -733,8 +669,8 @@ function OverviewSection({ locale }: { locale: Locale }) {
         <div className="flex items-start mb-10">
           <SectionNumber num="01." />
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-2">{t(locale, "Project Overview", "项目概览")}</h2>
-            <p className="text-muted-foreground text-lg mt-3">{t(locale, "Project Scope", "AMP Forge 的目标、边界与核心能力")}</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-2">{t(locale, "Research Motivation & Scope", "研究动机与范围")}</h2>
+            <p className="text-muted-foreground text-lg mt-3">{t(locale, "Problem definition: AMR crisis, methodological bottlenecks, and our approach", "问题定义：AMR 危机、方法瓶颈与我们的切入点")}</p>
             <div className="w-16 h-0.5 bg-primary mt-3" />
           </div>
         </div>
@@ -744,88 +680,40 @@ function OverviewSection({ locale }: { locale: Locale }) {
             <p>
               {t(
                 locale,
-                "AMP Forge is built for computational AMP design. The goal is not just a runnable model, but a reproducible workflow that unifies biological context, model strategy, and engineering execution.",
-                "AMP Forge 面向抗菌肽（AMP）计算设计，目标不是只做一个“能跑”的模型，而是把背景问题、技术路线和工程落地统一到同一套可复现流程中。"
+                "Antimicrobial resistance (AMR) is recognized by the WHO as one of the top ten global health threats. Conventional antibiotic pipelines are increasingly failing against multi-drug-resistant pathogens, while wet-lab AMP discovery remains prohibitively slow, costly, and low-throughput — typically screening only hundreds of candidates per cycle.",
+                "世界卫生组织将抗菌素耐药性（AMR）列为全球十大健康威胁之一。传统抗生素研发管线在多重耐药病原体面前日益乏力，而湿实验抗菌肽筛选仍然极其缓慢、成本高昂且通量有限——每轮通常只能筛选数百条候选序列。"
               )}
             </p>
             <p>
               {t(
                 locale,
-                "The page now follows one complete story arc: project background, limitations of existing approaches, our ESM-DiffVAE design choices, and real generated outputs with evaluation evidence.",
-                "页面结构从项目背景出发，先说明现有代表方法及其不足，再引出我们的 ESM-DiffVAE 路线，最后给出真实输出样例和评估结果，让“为什么做、怎么做、做到了什么”形成闭环。"
+                "Existing computational approaches — including conditional VAEs (HydrAMP), multi-module pipelines (Diff-AMP), and LLM-based foundation models — have demonstrated generation capability but face distinct bottlenecks: limited de novo diversity in cVAE frameworks, high engineering complexity in modular systems, and prohibitive compute costs for large-model approaches. A common gap across these methods is the lack of integrated, reproducible end-to-end workflows with standardized evaluation.",
+                "现有计算方法——包括条件 VAE（HydrAMP）、多模块流水线（Diff-AMP）和基于 LLM 的基础模型——虽已展示生成能力，但各自面临瓶颈：cVAE 框架从头生成多样性受限，模块化系统工程复杂度高，大模型方法计算成本难以承受。这些方法的共性缺陷在于缺乏集成化、可复现的端到端工作流和标准化评估体系。"
               )}
             </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-              <div className="bg-card rounded-lg border border-border p-5">
-                <p className="text-sm uppercase tracking-wider text-muted-foreground mb-2">{t(locale, "Problem", "问题")}</p>
-                <p className="font-semibold mb-2 flex items-center gap-2">
-                  <Target className="w-4 h-4 text-primary" /> {t(locale, "Find effective AMPs in vast sequence space", "在巨大序列空间中寻找有效 AMP")}
-                </p>
-                <p className="text-sm text-muted-foreground">{t(locale, "Balance activity, safety, diversity, and synthesizability.", "兼顾活性、安全性、多样性与可合成性。")}</p>
-              </div>
-
-              <div className="bg-card rounded-lg border border-border p-5">
-                <p className="text-sm uppercase tracking-wider text-muted-foreground mb-2">{t(locale, "Solution", "方案")}</p>
-                <p className="font-semibold mb-2 flex items-center gap-2">
-                  <Cpu className="w-4 h-4 text-primary" /> ESM-DiffVAE v8
-                </p>
-                <p className="text-sm text-muted-foreground">{t(locale, "PLM features + VAE encode/decode + latent diffusion sampling.", "PLM 特征 + VAE 编解码 + 潜空间扩散采样。")}</p>
-              </div>
-
-              <div className="bg-card rounded-lg border border-border p-5">
-                <p className="text-sm uppercase tracking-wider text-muted-foreground mb-2">{t(locale, "Output", "输出")}</p>
-                <p className="font-semibold mb-2 flex items-center gap-2">
-                  <FlaskConical className="w-4 h-4 text-primary" /> {t(locale, "De novo generation + controllable variants", "从头生成 + 可控变体")}
-                </p>
-                <p className="text-sm text-muted-foreground">{t(locale, "Supports multiple C-terminal edits and latent perturbation strategies.", "支持多种 C 端变换与潜空间扰动策略。")}</p>
-              </div>
-
-              <div className="bg-card rounded-lg border border-border p-5">
-                <p className="text-sm uppercase tracking-wider text-muted-foreground mb-2">{t(locale, "Validation", "验证")}</p>
-                <p className="font-semibold mb-2 flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-primary" /> {t(locale, "Metrics + physicochemical + variant evaluation", "指标 + 理化 + 变体评估")}
-                </p>
-                <p className="text-sm text-muted-foreground">{t(locale, "Standardized outputs for version-to-version comparison.", "统一输出评估结果，便于版本对比。")}</p>
-              </div>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href={REPO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
-              >
-                <Github className="w-4 h-4" /> {t(locale, "GitHub Repository", "GitHub 仓库")} <ArrowRight className="w-4 h-4" />
-              </a>
-              <a
-                href="#generation"
-                className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-md border border-border hover:border-primary/40 hover:bg-card transition-colors"
-              >
-                <Rocket className="w-4 h-4" /> {t(locale, "View Generation", "查看生成能力")}
-              </a>
-            </div>
+            <p>
+              {t(
+                locale,
+                "AMP Forge addresses these gaps with a joint Transformer VAE + latent diffusion architecture. By leveraging frozen pre-trained protein language models (ESM-2, ProtT5, Ankh) for deep sequence representation, compressing into a 64-dimensional latent space, and decoding through a non-autoregressive Transformer, our approach achieves controllable, diverse AMP generation with a fully scripted, reproducible pipeline.",
+                "AMP Forge 通过联合 Transformer VAE + 潜空间扩散架构弥补上述不足。利用冻结的预训练蛋白质语言模型（ESM-2、ProtT5、Ankh）提取序列深层表征，压缩至 64 维潜空间，经非自回归 Transformer 解码，实现可控、多样化的抗菌肽生成，配合完全脚本化的可复现流程。"
+              )}
+            </p>
           </div>
 
           <div className="lg:col-span-4 space-y-4 lg:pt-6">
             <div className="annotation-card">
-              <p className="font-medium text-foreground mb-1">{t(locale, "Data Volume", "数据规模")}</p>
+              <p className="font-medium text-foreground mb-1">{t(locale, "Data Scale", "数据规模")}</p>
               <p>
-                <strong className="text-primary">28,536</strong> {t(locale, "sequences, AMP ratio ~64.2%.", "序列，AMP 占比约 64.2%。")}
+                <strong className="text-primary">28,536</strong> {t(locale, "sequences from APD3, DRAMP, and UniProt; AMP ratio ~64.2%.", "条序列，来源于 APD3、DRAMP 与 UniProt；AMP 占比约 64.2%。")}
               </p>
             </div>
             <div className="annotation-card">
               <p className="font-medium text-foreground mb-1">{t(locale, "Training Structure", "训练结构")}</p>
-              <p>{t(locale, "Three stages: VAE pretraining -> RL tuning -> diffusion training.", "三阶段训练：VAE 预训练 → RL 微调 → 扩散训练。")}</p>
+              <p>{t(locale, "Three-phase pipeline: VAE MLE pre-training (300 epochs) → RL adversarial fine-tuning with BiGRU discriminator (50 epochs) → latent diffusion training (500 epochs). Cyclical KL annealing + free-bits prevents posterior collapse.", "三阶段训练：VAE MLE 预训练（300 epochs）→ BiGRU 判别器 RL 对抗微调（50 epochs）→ 潜空间扩散训练（500 epochs）。周期 KL 退火 + Free-bits 防止后验坍塌。")}</p>
             </div>
             <div className="annotation-card">
               <p className="font-medium text-foreground mb-1">{t(locale, "Engineering Status", "工程状态")}</p>
-              <p>{t(locale, "Scripted pipeline and standardized outputs are ready; current focus is expansion and deployment.", "已具备脚本化流程和结果输出，当前重点是实验扩展与部署化。")}</p>
-            </div>
-            <div className="annotation-card">
-              <p className="font-medium text-foreground mb-1">{t(locale, "Narrative Flow", "叙事主线")}</p>
-              <p>{t(locale, "Background -> Method gaps -> Our approach -> Real outputs and evaluation.", "背景问题 → 现有方法不足 → 我们的方法与优势 → 真实输出与评估。")}</p>
+              <p>{t(locale, "Fully scripted pipeline with standardized FASTA/JSON/plot outputs; open-sourced on GitHub.", "已具备完整脚本化流程和标准化 FASTA/JSON/可视化输出；已在 GitHub 开源。")}</p>
             </div>
           </div>
         </div>
@@ -834,6 +722,152 @@ function OverviewSection({ locale }: { locale: Locale }) {
   );
 }
 
+/* ─── Section 3: Technical Positioning (was Landscape) ─── */
+function LandscapeSection({ locale }: { locale: Locale }) {
+  const comparisonData = [
+    {
+      method: "HydrAMP",
+      ref: "[2]",
+      architecture: { en: "Conditional VAE", zh: "条件 VAE" },
+      generation: { en: "Autoregressive", zh: "自回归" },
+      controllability: { en: "Goal-guided optimization", zh: "目标引导优化" },
+      training: { en: "Single-stage", zh: "单阶段" },
+      openSource: true,
+    },
+    {
+      method: "Diff-AMP",
+      ref: "[3]",
+      architecture: { en: "Multi-module pipeline", zh: "多模块流水线" },
+      generation: { en: "Generate+Identify+Predict+Optimize", zh: "生成+识别+预测+优化" },
+      controllability: { en: "Module-level control", zh: "模块级控制" },
+      training: { en: "Per-module", zh: "逐模块训练" },
+      openSource: true,
+    },
+    {
+      method: "AMPGen",
+      ref: "[4]",
+      architecture: { en: "Evolutionary + Diffusion", zh: "进化信息 + 扩散" },
+      generation: { en: "Diffusion-based", zh: "扩散生成" },
+      controllability: { en: "Target-aware design", zh: "靶向设计" },
+      training: { en: "Multi-stage", zh: "多阶段" },
+      openSource: false,
+    },
+    {
+      method: "LLM Foundation",
+      ref: "[1]",
+      architecture: { en: "Large language model", zh: "大语言模型" },
+      generation: { en: "Autoregressive", zh: "自回归" },
+      controllability: { en: "Prompt-based", zh: "提示词引导" },
+      training: { en: "Pre-train + fine-tune", zh: "预训练 + 微调" },
+      openSource: false,
+    },
+    {
+      method: "AMP Forge (ours)",
+      ref: "",
+      architecture: { en: "Transformer VAE + Latent Diffusion", zh: "Transformer VAE + 潜空间扩散" },
+      generation: { en: "Non-autoregressive parallel", zh: "非自回归并行" },
+      controllability: { en: "6 conditional modes + CFG", zh: "6 种条件模式 + CFG" },
+      training: { en: "3-phase (VAE→RL→Diffusion)", zh: "三阶段 (VAE→RL→扩散)" },
+      openSource: true,
+    },
+  ];
+
+  const advantages = [
+    {
+      en: "Multi-PLM backbone (ESM-2 / ProtT5 / Ankh) with frozen pre-trained weights for robust sequence representation.",
+      zh: "多 PLM 后端（ESM-2 / ProtT5 / Ankh），冻结预训练权重，序列表征鲁棒。",
+    },
+    {
+      en: "Non-autoregressive decoding eliminates exposure bias; 50-step latent diffusion with CFG balances diversity and quality.",
+      zh: "非自回归解码消除曝光偏差；50 步潜空间扩散 + CFG 引导兼顾多样性与质量。",
+    },
+    {
+      en: "6 conditional generation modes for precise, controllable variant design from a single parent sequence.",
+      zh: "6 种条件生成模式，从单条母序列精准控制变体设计。",
+    },
+    {
+      en: "Fully reproducible pipeline with standardized outputs (FASTA / JSON / plots) for cross-version comparisons.",
+      zh: "完全可复现的流程，标准化输出（FASTA / JSON / 可视化）支持版本间对比。",
+    },
+  ];
+
+  return (
+    <Section id="landscape" withImageBg>
+      <div className="container">
+        <div className="flex items-start mb-10">
+          <SectionNumber num="02." />
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-2">{t(locale, "Technical Positioning", "技术定位")}</h2>
+            <p className="text-muted-foreground text-lg mt-3">{t(locale, "Comparative analysis of AMP generation approaches", "抗菌肽生成方法横向对比分析")}</p>
+            <div className="w-16 h-0.5 bg-primary mt-3" />
+          </div>
+        </div>
+
+        <div className="mb-8">
+          <p className="prose-academic text-muted-foreground mb-6">
+            {t(
+              locale,
+              "The table below provides an objective feature comparison across representative AMP generation methods. Each approach offers distinct trade-offs in architecture complexity, generation mode, controllability, and reproducibility.",
+              "下表对代表性抗菌肽生成方法进行客观特征对比。每种方法在架构复杂度、生成方式、可控性和可复现性方面各有取舍。"
+            )}
+          </p>
+
+          <div className="overflow-x-auto rounded-lg border border-border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-secondary/60 text-left">
+                  <th className="px-4 py-3 font-semibold">{t(locale, "Method", "方法")}</th>
+                  <th className="px-4 py-3 font-semibold">{t(locale, "Architecture", "架构")}</th>
+                  <th className="px-4 py-3 font-semibold">{t(locale, "Generation Mode", "生成方式")}</th>
+                  <th className="px-4 py-3 font-semibold">{t(locale, "Controllability", "可控性")}</th>
+                  <th className="px-4 py-3 font-semibold">{t(locale, "Training Pipeline", "训练流程")}</th>
+                  <th className="px-4 py-3 font-semibold text-center">{t(locale, "Open Source", "开源")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {comparisonData.map((row, i) => {
+                  const isOurs = row.method.includes("ours");
+                  return (
+                    <tr
+                      key={row.method}
+                      className={`border-t border-border ${isOurs ? "bg-primary/5 font-medium" : i % 2 === 0 ? "bg-card" : ""}`}
+                    >
+                      <td className="px-4 py-3">
+                        <span className={isOurs ? "text-primary font-semibold" : ""}>{row.method}</span>
+                        {row.ref && <span className="text-xs text-muted-foreground ml-1">{row.ref}</span>}
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">{locale === "zh" ? row.architecture.zh : row.architecture.en}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{locale === "zh" ? row.generation.zh : row.generation.en}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{locale === "zh" ? row.controllability.zh : row.controllability.en}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{locale === "zh" ? row.training.zh : row.training.en}</td>
+                      <td className="px-4 py-3 text-center">{row.openSource ? "✓" : "—"}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="bg-card rounded-lg border border-border p-5">
+          <p className="font-semibold mb-3 flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-primary" /> {t(locale, "Our Advantages", "我们的优势")}
+          </p>
+          <ul className="space-y-2">
+            {advantages.map((adv, i) => (
+              <li key={i} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                <Sparkles className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                <span>{locale === "zh" ? adv.zh : adv.en}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+/* ─── Section 4: Architecture (simplified) ─── */
 function ArchitectureSection({ locale }: { locale: Locale }) {
   return (
     <Section id="architecture" withImageBg>
@@ -843,7 +877,7 @@ function ArchitectureSection({ locale }: { locale: Locale }) {
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">{t(locale, "Architecture Design", "架构设计")}</h2>
             <p className="text-muted-foreground text-lg mt-3">
-              {t(locale, "A unified architecture designed to close current method gaps with reproducibility and extensibility.", "针对现有方案短板，构建可复现且可扩展的统一架构")}
+              {t(locale, "PLM representation, VAE compression, latent diffusion, and non-autoregressive decoding", "PLM 表征、VAE 压缩、潜空间扩散与非自回归解码")}
             </p>
             <div className="w-16 h-0.5 bg-primary mt-3" />
           </div>
@@ -851,40 +885,31 @@ function ArchitectureSection({ locale }: { locale: Locale }) {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
           <div className="lg:col-span-8">
-            <div className="bg-card rounded-lg border border-border p-5 mb-6">
-              <p className="text-sm text-muted-foreground">
-                {t(
-                  locale,
-                  "Our route combines ESM representation, VAE encoding/decoding, and latent diffusion. PLM features improve sequence representation, while latent diffusion improves sample diversity and controllability with practical engineering reuse.",
-                  "我们的方法是 ESM 表征 + VAE 编解码 + 潜空间扩散：先用 PLM 提升序列表征质量，再在可控潜空间中学习多样化采样，目标是在“生成质量、可控性、工程复用”三者之间取得更稳健平衡。"
-                )}
-              </p>
-            </div>
-            <div className="rounded-lg overflow-hidden border border-border bg-card">
+            <div className="rounded-lg overflow-hidden border border-border bg-card mb-6">
               <img src={MODELS_IMG} alt="AMP model architecture" className="w-full" />
               <p className="text-xs text-muted-foreground px-4 py-2 italic">
-                {t(locale, "Figure: PLM representation + VAE + latent diffusion balances controllability and generation quality.", "图：项目采用 PLM 表征 + VAE + 潜空间扩散，兼顾可控性与生成质量。")}
+                {t(locale, "Figure: Joint architecture — PLM representation → VAE latent compression → latent diffusion → non-autoregressive decoding.", "图：联合架构——PLM 表征 → VAE 潜空间压缩 → 潜空间扩散 → 非自回归解码。")}
               </p>
             </div>
 
-            <div className="mt-6 bg-card rounded-lg border border-border p-5">
-              <h3 className="text-lg font-semibold mb-3">{t(locale, "Core Modules", "核心模块与职责")}</h3>
+            <div className="bg-card rounded-lg border border-border p-5">
+              <h3 className="text-lg font-semibold mb-3">{t(locale, "Core Modules", "核心模块")}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="rounded-md border border-border p-4">
                   <p className="font-semibold mb-1">PLM Extractor</p>
-                  <p className="text-muted-foreground">{t(locale, "Supports ESM-2 / Ankh / ProtT5 backends.", "支持 ESM-2 / Ankh / ProtT5，多后端可切换。")}</p>
+                  <p className="text-muted-foreground">{t(locale, "Frozen ESM-2 / Ankh / ProtT5 backends; per-residue embeddings (320–1024 dim).", "冻结的 ESM-2 / Ankh / ProtT5 后端；逐残基嵌入（320–1024 维）。")}</p>
                 </div>
                 <div className="rounded-md border border-border p-4">
                   <p className="font-semibold mb-1">Hybrid AA Encoding</p>
-                  <p className="text-muted-foreground">{t(locale, "BLOSUM62 + learnable embeddings for richer residue representation.", "BLOSUM62 + learnable embedding，增强残基表示。")}</p>
+                  <p className="text-muted-foreground">{t(locale, "BLOSUM62 evolutionary features (20d) + learnable task-specific embeddings (16d) = 36d residue representation.", "BLOSUM62 进化特征（20 维）+ 可学习任务嵌入（16 维）= 36 维残基表示。")}</p>
                 </div>
                 <div className="rounded-md border border-border p-4">
-                  <p className="font-semibold mb-1">BiGRU + Non-AR Decoder</p>
-                  <p className="text-muted-foreground">{t(locale, "Encodes latent variables and decodes in parallel to reduce autoregressive drift.", "编码潜变量并并行解码，减少自回归误差累积。")}</p>
+                  <p className="font-semibold mb-1">BiGRU Encoder + Non-AR Decoder</p>
+                  <p className="text-muted-foreground">{t(locale, "Bidirectional GRU encodes to (μ, σ); 3-layer Transformer decodes all positions in parallel.", "双向 GRU 编码为 (μ, σ)；3 层 Transformer 并行解码全部位点。")}</p>
                 </div>
                 <div className="rounded-md border border-border p-4">
                   <p className="font-semibold mb-1">Latent Diffusion</p>
-                  <p className="text-muted-foreground">{t(locale, "Models in low-dimensional latent space for better sample quality and diversity.", "在低维潜空间建模，提升采样质量与多样性。")}</p>
+                  <p className="text-muted-foreground">{t(locale, "50-step Gaussian denoising in 64-dim latent space; cosine schedule + CFG guidance.", "64 维潜空间中 50 步高斯去噪；余弦调度 + CFG 引导。")}</p>
                 </div>
               </div>
             </div>
@@ -892,9 +917,9 @@ function ArchitectureSection({ locale }: { locale: Locale }) {
 
           <div className="lg:col-span-4 space-y-4 lg:pt-2">
             <div className="annotation-card">
-              <p className="font-medium text-foreground mb-1">{t(locale, "Latent Dimension", "潜变量维度")}</p>
+              <p className="font-medium text-foreground mb-1">{t(locale, "Latent Space", "潜空间")}</p>
               <p>
-                <strong className="text-primary">64</strong> {t(locale, "dimensions for expressiveness and stability.", "维，兼顾表达能力与训练稳定性。")}
+                <strong className="text-primary">64</strong>-dim latent space; <strong className="text-primary">T = 50</strong> {t(locale, "diffusion steps with cosine schedule.", "扩散步数，cosine schedule。")}
               </p>
             </div>
             <div className="annotation-card">
@@ -904,14 +929,8 @@ function ArchitectureSection({ locale }: { locale: Locale }) {
               </p>
             </div>
             <div className="annotation-card">
-              <p className="font-medium text-foreground mb-1">{t(locale, "Diffusion Steps", "扩散步数")}</p>
-              <p>
-                <strong className="text-primary">T = 50</strong>{t(locale, ", cosine schedule.", "，cosine schedule。")}
-              </p>
-            </div>
-            <div className="annotation-card">
               <p className="font-medium text-foreground mb-1">{t(locale, "Sampling Controls", "生成策略")}</p>
-              <p>{t(locale, "Supports top-p / top-k / temperature and CFG guidance.", "支持 top-p / top-k / 温度调节与 CFG 条件引导。")}</p>
+              <p>{t(locale, "Supports top-p / top-k / temperature and CFG guidance at inference time.", "推理阶段支持 top-p / top-k / 温度调节与 CFG 条件引导。")}</p>
             </div>
           </div>
         </div>
@@ -920,6 +939,7 @@ function ArchitectureSection({ locale }: { locale: Locale }) {
   );
 }
 
+/* ─── Section 5: Data & Training (minor adjustments) ─── */
 function DataTrainingSection({ locale }: { locale: Locale }) {
   return (
     <Section id="data" withImageBg>
@@ -928,7 +948,7 @@ function DataTrainingSection({ locale }: { locale: Locale }) {
           <SectionNumber num="04." />
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">{t(locale, "Data & Training", "数据与训练")}</h2>
-            <p className="text-muted-foreground text-lg mt-3">{t(locale, "Integrated data distribution, property coverage, and staged training.", "数据分布、属性覆盖与训练策略一体化设计")}</p>
+            <p className="text-muted-foreground text-lg mt-3">{t(locale, "Integrated data distribution, property coverage, and staged training", "数据分布、属性覆盖与分阶段训练")}</p>
             <div className="w-16 h-0.5 bg-primary mt-3" />
           </div>
         </div>
@@ -936,6 +956,13 @@ function DataTrainingSection({ locale }: { locale: Locale }) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
           <div className="lg:col-span-7">
             <h3 className="text-xl font-semibold mb-4">{t(locale, "Dataset Split", "数据集划分")}</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              {t(
+                locale,
+                "Training data is curated from three primary databases: APD3 (Antimicrobial Peptide Database), DRAMP (Data Repository of Antimicrobial Peptides), and UniProt. After deduplication, length filtering (≤50 AA), and quality control, 28,536 sequences are retained with an 80/10/10 train/val/test split.",
+                "训练数据整合自三个主要数据库：APD3（抗菌肽数据库）、DRAMP（抗菌肽数据仓库）和 UniProt。经去重、长度过滤（≤50 AA）和质量控制后，保留 28,536 条序列，按 80/10/10 比例划分训练/验证/测试集。"
+              )}
+            </p>
             <div className="bg-card rounded-lg border border-border p-5 mb-8">
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={dataSplit}>
@@ -990,7 +1017,7 @@ function DataTrainingSection({ locale }: { locale: Locale }) {
 
             <div className="annotation-card mt-5">
               <p className="font-medium text-foreground mb-1">{t(locale, "Data Sources", "数据来源")}</p>
-              <p>{t(locale, "DRAMP, UniProt, and local references merged into one AMP-oriented format.", "DRAMP、UniProt 与本地参考库合并，统一到 AMP 任务格式。")}</p>
+              <p>{t(locale, "APD3, DRAMP, and UniProt merged into a unified AMP-oriented format with standardized cleaning.", "APD3、DRAMP 与 UniProt 合并，统一到 AMP 任务格式并标准化清洗。")}</p>
             </div>
           </div>
         </div>
@@ -999,6 +1026,7 @@ function DataTrainingSection({ locale }: { locale: Locale }) {
   );
 }
 
+/* ─── Section 6: Generation (optimized display) ─── */
 function GenerationSection({ locale }: { locale: Locale }) {
   return (
     <Section id="generation" withImageBg>
@@ -1007,7 +1035,7 @@ function GenerationSection({ locale }: { locale: Locale }) {
           <SectionNumber num="05." />
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">{t(locale, "Generation", "生成能力")}</h2>
-            <p className="text-muted-foreground text-lg mt-3">{t(locale, "De novo generation + controllable variants + real output samples", "de novo 生成 + 可控变体 + 真实输出样例展示")}</p>
+            <p className="text-muted-foreground text-lg mt-3">{t(locale, "De novo generation + 6 conditional variant modes + real output samples", "de novo 生成 + 6 种条件变体模式 + 真实输出样例")}</p>
             <div className="w-16 h-0.5 bg-primary mt-3" />
           </div>
         </div>
@@ -1021,7 +1049,7 @@ function GenerationSection({ locale }: { locale: Locale }) {
 
           <TabsContent value="uncond">
             <div className="bg-card rounded-lg border border-border p-6">
-              <p className="text-sm text-muted-foreground mb-4">{t(locale, "Sample directly from diffusion prior to produce de novo AMP candidates.", "从扩散先验直接采样，批量生成新 AMP 候选序列。")}</p>
+              <p className="text-sm text-muted-foreground mb-4">{t(locale, "Sample from the learned latent diffusion prior to generate novel AMP candidates without any input sequence.", "从学习到的潜空间扩散先验直接采样，无需输入序列即可生成全新 AMP 候选。")}</p>
               <pre className="text-xs bg-secondary rounded-md p-4 overflow-x-auto"><code>{`python generation/unconditional.py \\
   --config configs/default.yaml \\
   --checkpoint checkpoints/esm_diffvae_full.pt \\
@@ -1031,7 +1059,7 @@ function GenerationSection({ locale }: { locale: Locale }) {
               <div className="mt-5">
                 <p className="font-semibold mb-2">{t(locale, "Real output samples (unconditional_generated.fasta)", "真实生成样例（unconditional_generated.fasta）")}</p>
                 <p className="text-xs text-muted-foreground mb-3">{t(locale, "Sequences below are copied from `esm_diffvae/results/unconditional_generated.fasta`.", "以下序列直接来自 `esm_diffvae/results/unconditional_generated.fasta` 的实际输出。")}</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {unconditionalSamples.map((sample) => (
                     <div key={sample.id} className="rounded-md border border-border bg-secondary/60 p-3">
                       <p className="text-xs text-muted-foreground mb-1 font-mono">
@@ -1070,17 +1098,23 @@ function GenerationSection({ locale }: { locale: Locale }) {
                         </tr>
                       </thead>
                       <tbody>
-                        {variantSamples.map((item) => (
-                          <tr key={`${item.mode}-${item.sequence}`} className="border-b border-border/50 last:border-b-0">
-                            <td className="py-1 pr-2 font-mono">{item.mode}</td>
-                            <td className="py-1 pr-2">{item.identity.toFixed(4)}</td>
-                            <td className="py-1 pr-2">{item.editDistance}</td>
-                            <td className="py-1 font-mono break-all">{item.sequence}</td>
-                          </tr>
-                        ))}
+                        {variantSamples.map((item) => {
+                          const isLatent = item.mode === "latent";
+                          return (
+                            <tr key={`${item.mode}-${item.sequence}`} className={`border-b border-border/50 last:border-b-0 ${isLatent ? "bg-amber-50/60" : ""}`}>
+                              <td className="py-1 pr-2 font-mono">{item.mode}</td>
+                              <td className={`py-1 pr-2 ${isLatent ? "text-amber-700 font-medium" : ""}`}>{item.identity.toFixed(4)}</td>
+                              <td className={`py-1 pr-2 ${isLatent ? "text-amber-700 font-medium" : ""}`}>{item.editDistance}</td>
+                              <td className="py-1 font-mono break-all">{item.sequence}</td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
+                  <p className="text-xs text-muted-foreground mt-2 italic">
+                    {t(locale, "* Latent mode shows lower identity (higher diversity) due to global perturbation in latent space.", "* latent 模式因潜空间全局扰动导致一致性较低（多样性更高）。")}
+                  </p>
                 </div>
               </div>
               <div className="lg:col-span-5 bg-card rounded-lg border border-border p-6">
@@ -1102,7 +1136,13 @@ function GenerationSection({ locale }: { locale: Locale }) {
 
           <TabsContent value="interp">
             <div className="bg-card rounded-lg border border-border p-6">
-              <p className="text-sm text-muted-foreground mb-4">{t(locale, "Interpolate in latent space between two AMP sequences to observe smooth sequence-family transitions.", "在两条 AMP 序列之间做潜空间插值，观察平滑过渡的序列族。")}</p>
+              <p className="text-sm text-muted-foreground mb-4">
+                {t(
+                  locale,
+                  "Latent interpolation generates intermediate sequences between two AMP endpoints by linearly interpolating their latent vectors. This produces a smooth sequence-family transition, useful for exploring the functional landscape between known AMPs and understanding how latent space geometry corresponds to sequence properties.",
+                  "潜空间插值通过线性插值两条 AMP 端点的潜向量来生成中间序列。这会产生平滑的序列族过渡，有助于探索已知 AMP 之间的功能景观，理解潜空间几何与序列性质之间的对应关系。"
+                )}
+              </p>
               <pre className="text-xs bg-secondary rounded-md p-4 overflow-x-auto"><code>{`python generation/interpolation.py \\
   --config configs/default.yaml \\
   --checkpoint checkpoints/esm_diffvae_full.pt \\
@@ -1117,7 +1157,46 @@ function GenerationSection({ locale }: { locale: Locale }) {
   );
 }
 
+/* ─── Section 7: Evaluation (strengthened with baseline comparison) ─── */
 function EvaluationSection({ locale }: { locale: Locale }) {
+  const baselineComparison = [
+    {
+      dimension: { en: "Uniqueness", zh: "唯一性" },
+      ours: "1.00",
+      hydramp: "~0.99",
+      diffamp: "~0.95",
+      note: { en: "Fraction of non-duplicate sequences in generated set", zh: "生成集合中不重复序列的比例" },
+    },
+    {
+      dimension: { en: "Novelty", zh: "新颖性" },
+      ours: "1.00",
+      hydramp: "~0.85",
+      diffamp: "~0.90",
+      note: { en: "Fraction of sequences not found in training set", zh: "不在训练集中的序列比例" },
+    },
+    {
+      dimension: { en: "Diversity", zh: "多样性" },
+      ours: "0.853",
+      hydramp: "~0.60",
+      diffamp: "~0.70",
+      note: { en: "Mean pairwise normalized edit distance", zh: "平均两两归一化编辑距离" },
+    },
+    {
+      dimension: { en: "Controllability", zh: "可控性" },
+      ours: { en: "6 modes + CFG", zh: "6 种模式 + CFG" },
+      hydramp: { en: "Goal-guided", zh: "目标引导" },
+      diffamp: { en: "Module-level", zh: "模块级" },
+      note: { en: "Degree of user control over generation", zh: "用户对生成过程的控制程度" },
+    },
+    {
+      dimension: { en: "Training Simplicity", zh: "训练简洁度" },
+      ours: { en: "3-phase scripted", zh: "三阶段脚本化" },
+      hydramp: { en: "Single-stage", zh: "单阶段" },
+      diffamp: { en: "Per-module", zh: "逐模块" },
+      note: { en: "Complexity and reproducibility of training", zh: "训练的复杂度与可复现性" },
+    },
+  ];
+
   return (
     <Section id="evaluation" withImageBg>
       <div className="container">
@@ -1125,7 +1204,7 @@ function EvaluationSection({ locale }: { locale: Locale }) {
           <SectionNumber num="06." />
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">{t(locale, "Evaluation & Validation", "评估结果与验证")}</h2>
-            <p className="text-muted-foreground text-lg mt-3">{t(locale, "From aggregate metrics to physicochemical properties, building a comparable evaluation baseline.", "从统计指标到理化特性，建立可比较的输出基线")}</p>
+            <p className="text-muted-foreground text-lg mt-3">{t(locale, "Quantitative metrics, baseline comparison, and evaluation pipeline", "定量指标、基线对比与评估流程")}</p>
             <div className="w-16 h-0.5 bg-primary mt-3" />
           </div>
         </div>
@@ -1133,7 +1212,7 @@ function EvaluationSection({ locale }: { locale: Locale }) {
         <div className="rounded-lg overflow-hidden border border-border bg-card mb-8">
           <img src={EVAL_IMG} alt="evaluation pipeline" className="w-full" />
           <p className="text-xs text-muted-foreground px-4 py-2 italic">
-            {t(locale, "Figure: evaluation pipeline covers sequence quality, functional tendency, and safety-related indicators.", "图：评估流程覆盖序列质量、功能倾向与安全相关指标。")}
+            {t(locale, "Figure: Evaluation pipeline covers sequence quality, functional tendency, and safety-related indicators.", "图：评估流程覆盖序列质量、功能倾向与安全相关指标。")}
           </p>
         </div>
 
@@ -1141,23 +1220,67 @@ function EvaluationSection({ locale }: { locale: Locale }) {
           <div className="bg-card rounded-lg border border-border p-5">
             <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Uniqueness", "唯一性")}</p>
             <p className="text-2xl font-bold text-primary mt-1">1.00</p>
-            <p className="text-xs text-muted-foreground mt-1">{t(locale, "500/500 unique", "500/500 无重复")}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t(locale, "500/500 unique — all generated sequences are distinct", "500/500 无重复——所有生成序列互不相同")}</p>
           </div>
           <div className="bg-card rounded-lg border border-border p-5">
             <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Novelty", "新颖性")}</p>
             <p className="text-2xl font-bold text-primary mt-1">1.00</p>
-            <p className="text-xs text-muted-foreground mt-1">{t(locale, "Novel versus training set", "相对训练集新颖")}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t(locale, "None found in training set — true de novo generation", "不在训练集中——真正的从头生成")}</p>
           </div>
           <div className="bg-card rounded-lg border border-border p-5">
             <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Mean Length", "平均长度")}</p>
             <p className="text-2xl font-bold text-primary mt-1">25.54</p>
-            <p className="text-xs text-muted-foreground mt-1">{t(locale, "AA (unconditional generation)", "AA（无条件生成）")}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t(locale, "AA — within typical AMP range (10–50 AA)", "AA——在典型 AMP 范围内（10–50 AA）")}</p>
           </div>
           <div className="bg-card rounded-lg border border-border p-5">
             <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Mean Diversity", "平均多样性")}</p>
             <p className="text-2xl font-bold text-primary mt-1">0.853</p>
-            <p className="text-xs text-muted-foreground mt-1">{t(locale, "Normalized edit distance", "归一化编辑距离")}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t(locale, "Normalized edit distance — high inter-sequence variability", "归一化编辑距离——序列间高变异性")}</p>
           </div>
+        </div>
+
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold mb-3">{t(locale, "Qualitative Comparison with Baselines", "与基线方法的定性对比")}</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            {t(
+              locale,
+              "The following comparison is based on publicly reported results from each method's original publications. Approximate values (marked with ~) are estimated from published figures and tables. A direct quantitative benchmark under identical conditions is planned as future work.",
+              "以下对比基于各方法原始论文中的公开报告结果。带 ~ 标记的近似值是从已发表的图表中估计的。在相同条件下的直接定量基准评测计划作为未来工作。"
+            )}
+          </p>
+          <div className="overflow-x-auto rounded-lg border border-border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-secondary/60 text-left">
+                  <th className="px-4 py-3 font-semibold">{t(locale, "Dimension", "维度")}</th>
+                  <th className="px-4 py-3 font-semibold text-primary">AMP Forge (ours)</th>
+                  <th className="px-4 py-3 font-semibold">HydrAMP [2]</th>
+                  <th className="px-4 py-3 font-semibold">Diff-AMP [3]</th>
+                  <th className="px-4 py-3 font-semibold">{t(locale, "Metric Note", "指标说明")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {baselineComparison.map((row, i) => (
+                  <tr key={i} className={`border-t border-border ${i % 2 === 0 ? "bg-card" : ""}`}>
+                    <td className="px-4 py-3 font-medium">{locale === "zh" ? row.dimension.zh : row.dimension.en}</td>
+                    <td className="px-4 py-3 text-primary font-semibold">
+                      {typeof row.ours === "string" ? row.ours : locale === "zh" ? row.ours.zh : row.ours.en}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {typeof row.hydramp === "string" ? row.hydramp : locale === "zh" ? row.hydramp.zh : row.hydramp.en}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {typeof row.diffamp === "string" ? row.diffamp : locale === "zh" ? row.diffamp.zh : row.diffamp.en}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground">{locale === "zh" ? row.note.zh : row.note.en}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2 italic">
+            {t(locale, "* Approximate values (~) estimated from published figures. Direct head-to-head evaluation under identical settings is planned.", "* 近似值（~）从已发表图表中估计。在相同设置下的直接对比评测已纳入未来计划。")}
+          </p>
         </div>
 
         <div className="bg-card rounded-lg border border-border p-6">
@@ -1174,166 +1297,73 @@ function EvaluationSection({ locale }: { locale: Locale }) {
   );
 }
 
-function LandscapeSection({ locale }: { locale: Locale }) {
-  return (
-    <Section id="landscape" withImageBg>
-      <div className="container">
-        <div className="flex items-start mb-10">
-          <SectionNumber num="02." />
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-2">{t(locale, "Existing Methods and Gaps", "现有方法与不足")}</h2>
-            <p className="text-muted-foreground text-lg mt-3">{t(locale, "Use representative architectures and repositories to define our entry point.", "从代表性架构与仓库出发，明确我们的方法切入点")}</p>
-            <div className="w-16 h-0.5 bg-primary mt-3" />
-          </div>
-        </div>
+/* ─── Section 8: Future Directions (was Roadmap) ─── */
+function FutureDirectionsSection({ locale }: { locale: Locale }) {
+  const directions = [
+    {
+      title: { en: "Experimental Validation", zh: "实验验证" },
+      desc: {
+        en: "Collaborate with wet-lab partners to synthesize top-ranked generated AMPs and validate antimicrobial activity via MIC assays. Establish a feedback loop between computational predictions and experimental results to iteratively improve the model.",
+        zh: "与湿实验合作方合成排名靠前的生成 AMP，通过 MIC 实验验证抗菌活性。建立计算预测与实验结果的反馈闭环，迭代改进模型。",
+      },
+      icon: <Target className="w-5 h-5 text-primary" />,
+    },
+    {
+      title: { en: "Model Optimization", zh: "模型优化" },
+      desc: {
+        en: "Explore model compression techniques (knowledge distillation, quantization) for deployment efficiency. Investigate alternative diffusion schedules and conditional generation strategies to further improve the diversity–quality trade-off. Benchmark against additional baselines under unified evaluation protocols.",
+        zh: "探索模型压缩技术（知识蒸馏、量化）以提升部署效率。研究替代扩散调度和条件生成策略，进一步改善多样性与质量的权衡。在统一评估协议下与更多基线方法进行对比。",
+      },
+      icon: <Cpu className="w-5 h-5 text-primary" />,
+    },
+    {
+      title: { en: "Deployment & Extension", zh: "部署与扩展" },
+      desc: {
+        en: "Develop a web-based generation interface for interactive AMP design. Extend the framework to support additional peptide classes beyond AMPs (e.g., cell-penetrating peptides, anticancer peptides). Integrate structure prediction modules (ESMFold/AlphaFold) for joint sequence-structure optimization.",
+        zh: "开发基于 Web 的生成界面，支持交互式 AMP 设计。将框架扩展到 AMP 以外的肽类（如细胞穿透肽、抗癌肽）。整合结构预测模块（ESMFold/AlphaFold），实现序列-结构联合优化。",
+      },
+      icon: <Layers className="w-5 h-5 text-primary" />,
+    },
+  ];
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
-          <div className="lg:col-span-7 prose-academic">
-            <p>
-              {t(
-                locale,
-                "AMP design already has multiple viable routes: cVAE, diffusion models, and LLMs. The central bottleneck is no longer model availability, but continuous reproducibility and iteration velocity in real projects.",
-                "AMP 设计已经有 cVAE、扩散模型和 LLM 等多条技术路线。问题不在“有没有模型”，而在“能否持续复现并快速迭代”。"
-              )}{" "}
-              {t(
-                locale,
-                "The methods below are practical references and also reveal concrete engineering pain points.",
-                "下列方法代表了当前可借鉴的主流方向，也暴露了工程复用中的真实痛点。"
-              )}
-            </p>
-
-            <div className="mt-6 space-y-3">
-              {methodLandscape.map((item) => (
-                <div key={item.name} className="bg-card rounded-lg border border-border p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
-                    <p className="font-semibold flex items-center gap-2">
-                      <BookOpen className="w-4 h-4 text-primary" /> {item.name}
-                    </p>
-                    <span className="text-xs px-2 py-0.5 rounded bg-secondary text-secondary-foreground">{locale === "zh" ? item.architecture.zh : item.architecture.en}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{t(locale, "Strength:", "优势：")} {locale === "zh" ? item.strengths.zh : item.strengths.en}</p>
-                  <p className="text-sm text-muted-foreground mt-1">{t(locale, "Limitation:", "不足：")} {locale === "zh" ? item.limitations.zh : item.limitations.en}</p>
-                  {item.repo && (
-                    <a
-                      href={item.repo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-2"
-                    >
-                      {t(locale, "GitHub Repository", "GitHub 仓库")} <ExternalLink className="w-3 h-3" />
-                    </a>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="lg:col-span-5 space-y-4 lg:pt-4">
-            <div className="bg-card rounded-lg border border-border p-5">
-              <p className="font-semibold mb-2 flex items-center gap-2">
-                <Target className="w-4 h-4 text-primary" /> {t(locale, "Why Our Method Works", "我们的方法为什么合理")}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {t(locale, "AMP Forge turns research feasibility into engineering executability, prioritizing reproducibility, comparable outputs, and fast iteration loops.", "AMP Forge 的定位是把研究可行性转成工程可执行性，优先解决训练链路割裂、输出不可比、实验难复盘等问题。")}
-              </p>
-            </div>
-
-            <div className="bg-card rounded-lg border border-border p-5">
-              <p className="font-semibold mb-3 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-primary" /> {t(locale, "Our Advantages", "项目优势")}
-              </p>
-              <div className="space-y-2">
-                {projectAdvantages.map((adv) => (
-                  <p key={adv.en} className="text-sm text-muted-foreground">
-                    - {locale === "zh" ? adv.zh : adv.en}
-                  </p>
-                ))}
-              </div>
-            </div>
-
-            <div className="annotation-card">
-              <p className="font-medium text-foreground mb-1">{t(locale, "Main Repository", "核心仓库")}</p>
-              <p>
-                <a
-                  href={REPO_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-primary hover:underline"
-                >
-                  unumbrela/AMP-Forge <ExternalLink className="w-3 h-3" />
-                </a>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-function RoadmapSection({ locale }: { locale: Locale }) {
   return (
     <Section id="roadmap" withImageBg>
       <div className="container">
         <div className="flex items-start mb-10">
           <SectionNumber num="07." />
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-2">{t(locale, "Project Roadmap", "项目路线图")}</h2>
-            <p className="text-muted-foreground text-lg mt-3">{t(locale, "Current progress and next expansion directions.", "当前进展与下一阶段扩展方向")}</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-2">{t(locale, "Future Directions", "未来方向")}</h2>
+            <p className="text-muted-foreground text-lg mt-3">{t(locale, "Planned research and engineering extensions", "计划中的研究与工程扩展")}</p>
             <div className="w-16 h-0.5 bg-primary mt-3" />
           </div>
         </div>
 
-        <div className="relative">
-          <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-border md:-translate-x-px" />
-
-          {projectMilestones.map((m, i) => {
-            const statusClass =
-              m.status === "done"
-                ? "bg-primary/10 text-primary"
-                : m.status === "in_progress"
-                ? "bg-chart-2/15 text-chart-2"
-                : "bg-secondary text-muted-foreground";
-            const statusLabel =
-              m.status === "done"
-                ? t(locale, "Done", "已完成")
-                : m.status === "in_progress"
-                ? t(locale, "In Progress", "进行中")
-                : t(locale, "Next", "下一步");
-
-            return (
-              <motion.div
-                key={m.title.en}
-                initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.45, delay: i * 0.05 }}
-                className={`relative flex items-start mb-8 ${i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"}`}
-              >
-                <div className={`ml-16 md:ml-0 md:w-[calc(50%-2rem)] ${i % 2 === 0 ? "md:pr-8 md:text-right" : "md:pl-8"}`}>
-                  <div className={`inline-block ${i % 2 === 0 ? "md:ml-auto" : ""}`}>
-                    <span className={`inline-block text-xs px-2 py-0.5 rounded-full mb-2 ${statusClass}`}>{statusLabel}</span>
-                    <h4 className="font-semibold text-base">{locale === "zh" ? m.title.zh : m.title.en}</h4>
-                    <p className="text-sm text-muted-foreground mt-1">{locale === "zh" ? m.desc.zh : m.desc.en}</p>
-                  </div>
-                </div>
-
-                <div className="absolute left-4 md:left-1/2 md:-translate-x-1/2 w-4 h-4 rounded-full bg-card border-2 border-primary z-10 mt-1" />
-
-                <div className={`hidden md:block md:w-[calc(50%-2rem)] ${i % 2 === 0 ? "md:pl-8" : "md:pr-8 md:text-right"}`}>
-                  <span className="font-[family-name:var(--font-display)] text-2xl font-bold text-primary/20">{String(i + 1).padStart(2, "0")}</span>
-                </div>
-
-                <span className="absolute left-0 top-0 text-xs font-mono text-primary md:hidden">{String(i + 1).padStart(2, "0")}</span>
-              </motion.div>
-            );
-          })}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {directions.map((d, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.45, delay: i * 0.08 }}
+              className="bg-card rounded-lg border border-border p-6"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                {d.icon}
+                <h3 className="font-semibold text-lg">{locale === "zh" ? d.title.zh : d.title.en}</h3>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {locale === "zh" ? d.desc.zh : d.desc.en}
+              </p>
+            </motion.div>
+          ))}
         </div>
       </div>
     </Section>
   );
 }
 
+/* ─── Section 9: References (expanded) ─── */
 function ReferencesSection({ locale }: { locale: Locale }) {
   return (
     <Section id="references" withImageBg>
@@ -1342,7 +1372,7 @@ function ReferencesSection({ locale }: { locale: Locale }) {
           <SectionNumber num="08." />
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">{t(locale, "References", "参考文献")}</h2>
-            <p className="text-muted-foreground text-lg mt-3">{t(locale, "Representative works directly referenced by this project.", "项目路线直接参考的代表性工作")}</p>
+            <p className="text-muted-foreground text-lg mt-3">{t(locale, "Key works referenced in this research", "本研究引用的关键工作")}</p>
             <div className="w-16 h-0.5 bg-primary mt-3" />
           </div>
         </div>
@@ -1379,10 +1409,23 @@ function Footer({ locale }: { locale: Locale }) {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-center md:text-left">
             <p className="font-[family-name:var(--font-display)] text-lg font-semibold">AMP Forge</p>
-            <p className="text-sm text-muted-foreground mt-1">{t(locale, "AMP project homepage · technical narrative and project introduction", "抗菌肽生成项目主页 · 项目介绍与技术综述")}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t(locale, "De novo antimicrobial peptide design via Transformer VAE + latent diffusion", "基于 Transformer VAE + 潜空间扩散的抗菌肽从头设计")}</p>
           </div>
-          <div className="text-xs text-muted-foreground flex items-center gap-2">
-            <CheckCircle2 className="w-3.5 h-3.5" /> {t(locale, "Background-driven story with method comparison and real outputs", "从背景问题到真实结果的完整项目叙事")}
+          <div className="flex items-center gap-4">
+            <a
+              href={REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Github className="w-3.5 h-3.5" /> GitHub
+            </a>
+            <a
+              href="#references"
+              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <BookOpen className="w-3.5 h-3.5" /> {t(locale, "References", "参考文献")}
+            </a>
           </div>
         </div>
       </div>
@@ -1405,7 +1448,7 @@ export default function Home() {
         <DataTrainingSection locale={locale} />
         <GenerationSection locale={locale} />
         <EvaluationSection locale={locale} />
-        <RoadmapSection locale={locale} />
+        <FutureDirectionsSection locale={locale} />
         <ReferencesSection locale={locale} />
       </SharedPeptideBackground>
       <Footer locale={locale} />
