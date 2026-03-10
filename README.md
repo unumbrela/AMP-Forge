@@ -32,18 +32,13 @@ AMP Forge is a de novo antimicrobial peptide (AMP) design platform built on a jo
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    A[Input AMP Sequence] --> B["PLM Extractor\n(ESM-2 / ProtT5 / Ankh)"]
-    A --> C["AA Hybrid Encoding\n(BLOSUM62 + Learnable)"]
-    B --> D[BiGRU Encoder]
-    C --> D
-    D --> E["Latent z (64-dim)"]
-    E --> F["Latent Diffusion\n(T=50, Cosine, CFG)"]
-    E --> P["Property Heads\n(AMP / MIC / Tox / Hemo)"]
-    F --> G["Non-AR Transformer Decoder\n(3-layer, 4-head)"]
-    G --> H[Generated AMP Sequence]
-```
+<p align="center">
+  <img src="./frontend/client/public/images/model_structure.png" alt="AMP Forge architecture design" width="100%" />
+</p>
+
+<p align="center">
+  <em>Joint architecture: PLM representation -> VAE latent compression -> latent diffusion -> non-autoregressive Transformer decoding.</em>
+</p>
 
 ## Repository Structure
 

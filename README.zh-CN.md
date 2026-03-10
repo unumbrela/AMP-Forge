@@ -34,18 +34,13 @@ AMP Forge 是一个基于 **Transformer VAE + 潜空间扩散模型 (Latent Diff
 
 ## 架构
 
-```mermaid
-flowchart LR
-    A[输入 AMP 序列] --> B["PLM 特征提取\n(ESM-2 / ProtT5 / Ankh)"]
-    A --> C["AA 混合编码\n(BLOSUM62 + Learnable)"]
-    B --> D[BiGRU 编码器]
-    C --> D
-    D --> E["潜变量 z (64 维)"]
-    E --> F["潜空间扩散\n(T=50, Cosine, CFG)"]
-    E --> P["属性预测头\n(AMP / MIC / 毒性 / 溶血)"]
-    F --> G["非自回归 Transformer 解码器\n(3 层, 4 头)"]
-    G --> H[生成 AMP 序列]
-```
+<p align="center">
+  <img src="./frontend/client/public/images/model_structure.png" alt="AMP Forge 架构设计图" width="100%" />
+</p>
+
+<p align="center">
+  <em>联合架构：PLM 表征 -> VAE 潜空间压缩 -> 潜空间扩散 -> 非自回归 Transformer 解码。</em>
+</p>
 
 ## 仓库结构
 
