@@ -15,11 +15,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
 } from "recharts";
 import {
   ArrowRight,
@@ -42,12 +37,13 @@ function t(locale: Locale, en: string, zh: string) {
   return locale === "zh" ? zh : en;
 }
 
-const MODELS_IMG =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663390962009/nwNByvtJSze5gMGiNTNhXC/generation-models-imLzwiPRbyJQnYUeagQ5pB.webp";
-const EVAL_IMG =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663390962009/nwNByvtJSze5gMGiNTNhXC/evaluation-pipeline-CkDvrw87vYQELZsHzvSFE7.webp";
-const BG_IMG =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663390962009/nwNByvtJSze5gMGiNTNhXC/abstract-peptide-bg-7vmSS9d64cv7cVh5spxu7y.webp";
+const STATIC_IMG_BASE = `${import.meta.env.BASE_URL}images/`;
+const MODELS_IMG = `${STATIC_IMG_BASE}generation-models.webp`;
+const EVAL_IMG = `${STATIC_IMG_BASE}evaluation-pipeline.webp`;
+const ARCH_DETAIL_IMG = `${STATIC_IMG_BASE}model_structure.png`;
+const LL37_RESULT_IMG = `${STATIC_IMG_BASE}result_LL37.jpg`;
+const LL37V1_RESULT_IMG = `${STATIC_IMG_BASE}result_LL37v1.png`;
+const BG_IMG = `${STATIC_IMG_BASE}abstract-peptide-bg.webp`;
 const AMP_HOME_BG = "#f8f7f3";
 const REPO_URL = "https://github.com/unumbrela/AMP-Forge";
 const IGEM_LEGEND_ITEMS = [
@@ -72,14 +68,6 @@ const dataSplit = [
   { split: "Train", value: 22828 },
   { split: "Val", value: 2854 },
   { split: "Test", value: 2854 },
-];
-
-const propertyCoverage = [
-  { dimension: "MIC", value: 20.7 },
-  { dimension: "Hemolysis", value: 18.0 },
-  { dimension: "Toxicity", value: 8.9 },
-  { dimension: "AMP Label", value: 100 },
-  { dimension: "Length", value: 100 },
 ];
 
 const variantModes = [
@@ -596,8 +584,8 @@ function AmpHeroSection({ locale }: { locale: Locale }) {
           >
             {t(
               locale,
-              "Antimicrobial resistance is a growing global health crisis, yet conventional AMP discovery remains costly and low-throughput. We propose AMP Forge, a joint Transformer VAE and latent diffusion framework that generates diverse, controllable AMP candidates through non-autoregressive parallel decoding. Evaluated on 28,536 curated sequences, our approach achieves 1.00 uniqueness, 1.00 novelty, and 0.853 mean diversity.",
-              "抗菌素耐药性是日益严峻的全球健康危机，而传统抗菌肽发现仍然成本高、通量低。我们提出 AMP Forge——一个联合 Transformer VAE 与潜空间扩散模型的框架，通过非自回归并行解码生成多样化、可控的抗菌肽候选序列。在 28,536 条精选序列上评估，我们的方法实现了 1.00 唯一性、1.00 新颖性和 0.853 平均多样性。"
+              "Antimicrobial resistance is a growing global health crisis, yet conventional AMP discovery remains costly and low-throughput. We propose AMP Forge, a joint Transformer VAE and latent diffusion framework that generates diverse, controllable AMP candidates through non-autoregressive parallel decoding.",
+              "抗菌素耐药性是日益严峻的全球健康危机，而传统抗菌肽发现仍然成本高、通量低。我们提出 AMP Forge——一个联合 Transformer VAE 与潜空间扩散模型的框架，通过非自回归并行解码生成多样化、可控的抗菌肽候选序列。"
             )}
           </motion.p>
 
@@ -849,6 +837,10 @@ function LandscapeSection({ locale }: { locale: Locale }) {
           </div>
         </div>
 
+        <div className="rounded-lg overflow-hidden border border-border bg-card mb-8">
+          <img src={MODELS_IMG} alt="AMP Forge model architecture overview" className="w-full" />
+        </div>
+
         <div className="bg-card rounded-lg border border-border p-5">
           <p className="font-semibold mb-3 flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-primary" /> {t(locale, "Our Advantages", "我们的优势")}
@@ -877,7 +869,7 @@ function ArchitectureSection({ locale }: { locale: Locale }) {
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">{t(locale, "Architecture Design", "架构设计")}</h2>
             <p className="text-muted-foreground text-lg mt-3">
-              {t(locale, "PLM representation, VAE compression, latent diffusion, and non-autoregressive decoding", "PLM 表征、VAE 压缩、潜空间扩散与非自回归解码")}
+              {t(locale, "PLM representation, VAE compression, latent diffusion, and non-autoregressive Transformer decoding", "PLM 表征、VAE 压缩、潜空间扩散与非自回归Transformer解码")}
             </p>
             <div className="w-16 h-0.5 bg-primary mt-3" />
           </div>
@@ -886,10 +878,7 @@ function ArchitectureSection({ locale }: { locale: Locale }) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
           <div className="lg:col-span-8">
             <div className="rounded-lg overflow-hidden border border-border bg-card mb-6">
-              <img src={MODELS_IMG} alt="AMP model architecture" className="w-full" />
-              <p className="text-xs text-muted-foreground px-4 py-2 italic">
-                {t(locale, "Figure: Joint architecture — PLM representation → VAE latent compression → latent diffusion → non-autoregressive decoding.", "图：联合架构——PLM 表征 → VAE 潜空间压缩 → 潜空间扩散 → 非自回归解码。")}
-              </p>
+              <img src={ARCH_DETAIL_IMG} alt="Architecture module detail diagram" className="w-full" />
             </div>
 
             <div className="bg-card rounded-lg border border-border p-5">
@@ -982,17 +971,6 @@ function DataTrainingSection({ locale }: { locale: Locale }) {
               </ResponsiveContainer>
             </div>
 
-            <h3 className="text-xl font-semibold mb-4">{t(locale, "Property Coverage", "属性覆盖率")}</h3>
-            <div className="bg-card rounded-lg border border-border p-5">
-              <ResponsiveContainer width="100%" height={300}>
-                <RadarChart data={propertyCoverage}>
-                  <PolarGrid stroke="oklch(0.88 0.01 90)" />
-                  <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 11 }} />
-                  <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 10 }} />
-                  <Radar dataKey="value" stroke="oklch(0.65 0.2 25)" fill="oklch(0.65 0.2 25 / 0.22)" strokeWidth={2} />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
           </div>
 
           <div className="lg:col-span-5">
@@ -1283,14 +1261,49 @@ function EvaluationSection({ locale }: { locale: Locale }) {
           </p>
         </div>
 
-        <div className="bg-card rounded-lg border border-border p-6">
-          <p className="font-semibold mb-3">{t(locale, "Evaluation Entry", "评估入口")}</p>
-          <pre className="text-xs bg-secondary rounded-md p-4 overflow-x-auto mb-4"><code>{`python evaluation/run_evaluation.py \\
-  --config configs/default.yaml \\
-  --checkpoint checkpoints/esm_diffvae_full.pt`}</code></pre>
-          <p className="text-sm text-muted-foreground">
-            {t(locale, "Results are written to `esm_diffvae/results/evaluation/` as JSON, FASTA, and plots for cross-version comparisons.", "结果默认写入 `esm_diffvae/results/evaluation/`，包含 JSON、FASTA 与可视化图表，便于版本间对比。")}
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold mb-3">{t(locale, "Wet-Lab Experimental Validation", "湿实验合成验证")}</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            {t(
+              locale,
+              "To validate the practical antimicrobial potential of model-generated sequences, we selected 4 variants of the human cathelicidin LL-37 produced by AMP Forge for wet-lab synthesis and antimicrobial activity testing. All 4 synthesized variants demonstrated antimicrobial activity against target pathogens. Notably, Variant 1 showed significant improvements over the parent LL-37 in both antimicrobial potency and structural stability, confirming that the latent diffusion framework can generate functionally enhanced AMP candidates.",
+              "为验证模型生成序列的实际抗菌潜力，我们选取了 AMP Forge 生成的 4 条人源抗菌肽 LL-37 变体进行湿实验合成与抗菌活性测试。全部 4 条合成变体均表现出对目标病原菌的抗菌活性。其中变体 1 在抗菌活性和结构稳定性方面均较母体 LL-37 有显著提升，证实了潜空间扩散框架能够生成功能增强的抗菌肽候选序列。"
+            )}
           </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="bg-card rounded-lg border border-border p-4">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">{t(locale, "Variants Tested", "验证变体数")}</p>
+              <p className="text-2xl font-bold text-primary">4 / 4</p>
+              <p className="text-xs text-muted-foreground mt-1">{t(locale, "All showed antimicrobial activity", "全部表现出抗菌活性")}</p>
+            </div>
+            <div className="bg-card rounded-lg border border-border p-4">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">{t(locale, "Best Variant", "最优变体")}</p>
+              <p className="text-2xl font-bold text-primary">{t(locale, "Variant 1", "变体 1")}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t(locale, "Enhanced potency & stability vs. parent LL-37", "相比母体 LL-37 活性与稳定性均显著提升")}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="rounded-lg overflow-hidden border border-border bg-card">
+              <img src={LL37_RESULT_IMG} alt="LL-37 colony count: T=0 vs T=3h" className="w-full" />
+              <div className="px-4 py-3">
+                <p className="text-sm font-medium mb-1">{t(locale, "Parent LL-37", "母体 LL-37")}</p>
+                <p className="text-xs text-muted-foreground italic">
+                  {t(locale, "Colony count comparison: T=0 (initial inoculation) vs. T=3h (after LL-37 treatment). Baseline antimicrobial activity of the parent peptide.", "菌落计数对比：T=0（初始接种）vs. T=3h（LL-37 处理后）。母体肽的基线抗菌活性。")}
+                </p>
+              </div>
+            </div>
+            <div className="rounded-lg overflow-hidden border border-border bg-card">
+              <img src={LL37V1_RESULT_IMG} alt="LL-37 Variant 1 colony count: T=0 vs T=3h" className="w-full" />
+              <div className="px-4 py-3">
+                <p className="text-sm font-medium mb-1">{t(locale, "LL-37 Variant 1 (AMP Forge)", "LL-37 变体 1（AMP Forge 生成）")}</p>
+                <p className="text-xs text-muted-foreground italic">
+                  {t(locale, "Colony count comparison: T=0 vs. T=3h (after Variant 1 treatment). Variant 1 demonstrates significantly greater colony reduction compared to parent LL-37, indicating enhanced antimicrobial potency.", "菌落计数对比：T=0 vs. T=3h（变体 1 处理后）。变体 1 相比母体 LL-37 展现出显著更大的菌落减少量，表明抗菌活性增强。")}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </Section>
