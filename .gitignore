@@ -124,5 +124,10 @@ __pycache__/
 # Local notes / scratch
 /日志
 
+# Local alternate app and page backups
+/hpi-potsdam/
+/frontend/client/src/pages/Home.backup.*
+/.tooling-bin/
+
 # Local duplicate processed dataset copy
 esm_diffvae/data/processed copy/

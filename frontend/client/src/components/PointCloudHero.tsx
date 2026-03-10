@@ -1,9 +1,10 @@
 import { Component, useEffect, useMemo, useRef, useState, type ErrorInfo, type ReactNode } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Bloom, EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
 import Papa from "papaparse";
+import allAmpCsv from "../../../all_amp.csv?raw";
 import { cn } from "@/lib/utils";
 
 interface DataRow {
@@ -16,12 +17,16 @@ interface DataRow {
   id?: string | number;
 }
 
-interface SelectedPoint {
+interface HoveredPoint {
   id: string | number;
   name: string;
-  partType?: string;
+  part_type?: string;
   source?: string;
-  coordinates: { x: number; y: number; z: number };
+  position: [number, number, number];
+}
+
+interface AmpNameRow {
+  sequence?: string;
 }
 
 interface PointCloudHeroProps {
@@ -29,6 +34,17 @@ interface PointCloudHeroProps {
   className?: string;
   background?: string;
   showLegend?: boolean;
+  showOverlay?: boolean;
+  enableZoom?: boolean;
+  allowPageScrollOnWheel?: boolean;
+  highlightPartType?: string | null;
+  onHighlightPartTypeChange?: (partType: string | null) => void;
+  partTypeLabels?: Record<string, string>;
+  legendTitle?: string;
+  animateConvergence?: boolean;
+  convergenceProgress?: number;
+  controlledCameraDistance?: number;
+  onCameraMove?: (distance: number) => void;
 }
 
 const PART_TYPE_COLORS: Record<string, string> = {
@@ -72,19 +88,27 @@ const PART_TYPE_COLORS: Record<string, string> = {
   protein_domain: "#16a085",
 };
 
-function fallbackColorForType(type: string): string {
-  let hash = 0;
-  for (let i = 0; i < type.length; i++) {
-    hash = (hash * 31 + type.charCodeAt(i)) >>> 0;
+const AMP_DISPLAY_NAMES = Papa.parse<AmpNameRow>(allAmpCsv, {
+  header: true,
+  skipEmptyLines: true,
+}).data
+  .map((row) => String(row.sequence || "").trim())
+  .filter(Boolean);
+
+function getAmpDisplayName(index: number): string {
+  if (AMP_DISPLAY_NAMES.length === 0) {
+    return `AMP ${index + 1}`;
   }
-  const hue = hash % 360;
-  return `hsl(${hue}, 88%, 45%)`;
+
+  return AMP_DISPLAY_NAMES[index % AMP_DISPLAY_NAMES.length];
 }
 
 const vertexShader = /* glsl */ `
   attribute float aSize;
   attribute vec3 aColor;
   attribute float aHighlight;
+  attribute vec3 aInitialPosition;
+  uniform float uConvergenceProgress;
   varying vec3 vColor;
   varying float vDepth;
   varying float vHighlight;
@@ -93,10 +117,12 @@ const vertexShader = /* glsl */ `
     vColor = aColor;
     vHighlight = aHighlight;
 
-    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    vec3 finalPosition = mix(aInitialPosition, position, uConvergenceProgress);
+    vec4 mvPosition = modelViewMatrix * vec4(finalPosition, 1.0);
+
     float dist = -mvPosition.z;
     vDepth = dist;
-    float attenuation = clamp(360.0 / dist, 0.0, 10.0);
+    float attenuation = clamp(300.0 / dist, 0.0, 10.0);
     gl_PointSize = aSize * attenuation;
     gl_Position = projectionMatrix * mvPosition;
   }
@@ -113,17 +139,25 @@ const fragmentShader = /* glsl */ `
     float d = dot(uv, uv);
     float alpha = smoothstep(1.0, 0.0, d);
 
-    float depthFade = 1.0 - smoothstep(8.0, 22.0, vDepth) * 0.28;
+    float depthFade = 1.0 - smoothstep(5.0, 20.0, vDepth) * 0.4;
     alpha *= depthFade;
 
-    float dimFactor = vHighlight > 0.5 ? 1.0 : (vHighlight < -0.5 ? 0.18 : 1.0);
+    float dimFactor = vHighlight > 0.5 ? 1.0 : (vHighlight < -0.5 ? 0.25 : 1.0);
     alpha *= dimFactor;
 
-    float glow = smoothstep(0.22, 0.0, d) * 0.12;
-    vec3 color = vColor * 0.90 + vColor * glow;
-    gl_FragColor = vec4(color, min(alpha * 1.15, 1.0));
+    float glow = smoothstep(0.2, 0.0, d) * 0.25;
+    vec3 color = vColor + glow;
+    gl_FragColor = vec4(color, alpha);
   }
 `;
+
+function fallbackColorForType(type: string): string {
+  let hash = 0;
+  for (let i = 0; i < type.length; i++) {
+    hash = (hash * 31 + type.charCodeAt(i)) >>> 0;
+  }
+  return `hsl(${hash % 360}, 88%, 54%)`;
+}
 
 function checkWebGLSupport(): { supported: boolean; error?: string } {
   try {
@@ -131,7 +165,10 @@ function checkWebGLSupport(): { supported: boolean; error?: string } {
     const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
 
     if (!gl) {
-      return { supported: false, error: "WebGL is not supported by your browser" };
+      return {
+        supported: false,
+        error: "WebGL is not supported by your browser",
+      };
     }
 
     return { supported: true };
@@ -157,7 +194,7 @@ class StarFieldErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("[PointCloudHero] Render error:", error, errorInfo);
+    console.error("[PointCloudHero] Error caught by boundary:", error, errorInfo);
     this.props.onError(error);
   }
 
@@ -173,7 +210,7 @@ class StarFieldErrorBoundary extends Component<
 function useCSV(csvUrl: string) {
   const [rows, setRows] = useState<DataRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -239,28 +276,28 @@ function useCSV(csvUrl: string) {
   return { rows, error, loading };
 }
 
-function buildGeometryFromRows(rows: DataRow[]) {
+function buildGeometryFromRows(rows: DataRow[], generateRandomInitial: boolean) {
   const pointCount = rows.length;
   const positions = new Float32Array(pointCount * 3);
   const colors = new Float32Array(pointCount * 3);
   const sizes = new Float32Array(pointCount);
-  const highlights = new Float32Array(pointCount);
   const partTypes = new Array<string>(pointCount).fill("");
+  const initialPositions = generateRandomInitial ? new Float32Array(pointCount * 3) : null;
 
   let minX = Infinity;
-  let minY = Infinity;
-  let minZ = Infinity;
   let maxX = -Infinity;
+  let minY = Infinity;
   let maxY = -Infinity;
+  let minZ = Infinity;
   let maxZ = -Infinity;
 
-  const parsed = rows.map((row) => ({
+  const parsedRows = rows.map((row) => ({
     x: typeof row.x === "number" ? row.x : parseFloat(String(row.x)),
     y: typeof row.y === "number" ? row.y : parseFloat(String(row.y)),
     z: typeof row.z === "number" ? row.z : parseFloat(String(row.z)),
   }));
 
-  for (const coord of parsed) {
+  for (const coord of parsedRows) {
     if (Number.isFinite(coord.x)) {
       minX = Math.min(minX, coord.x);
       maxX = Math.max(maxX, coord.x);
@@ -278,7 +315,7 @@ function buildGeometryFromRows(rows: DataRow[]) {
   const rangeX = maxX - minX || 1;
   const rangeY = maxY - minY || 1;
   const rangeZ = maxZ - minZ || 1;
-  const scale = 240 / Math.max(rangeX, rangeY, rangeZ);
+  const scale = 500 / Math.max(rangeX, rangeY, rangeZ);
 
   const fallbackPalette = [
     new THREE.Color("#9ec9ff"),
@@ -289,40 +326,55 @@ function buildGeometryFromRows(rows: DataRow[]) {
     new THREE.Color("#fdffb6"),
   ];
   const partMap = new Map<string, number>();
-  let nextColor = 0;
+  let nextIndex = 0;
+  let center: { x: number; y: number; z: number } | undefined;
 
   for (let i = 0; i < pointCount; i++) {
     const row = rows[i];
-    const coord = parsed[i];
+    const coord = parsedRows[i];
 
     const x = Number.isFinite(coord.x) ? (coord.x - minX - rangeX / 2) * scale : 0;
     const y = Number.isFinite(coord.y) ? (coord.y - minY - rangeY / 2) * scale : 0;
     const z = Number.isFinite(coord.z) ? (coord.z - minZ - rangeZ / 2) * scale : 0;
 
+    if (row.id == 22801) {
+      center = { x, y, z };
+    }
+
     positions[i * 3] = x;
     positions[i * 3 + 1] = y;
     positions[i * 3 + 2] = z;
 
-    sizes[i] = 1.15 + Math.random() * 1.6;
-    highlights[i] = 0;
+    if (initialPositions) {
+      const randomRadius = 800;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const radius = Math.random() * randomRadius;
+
+      initialPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      initialPositions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      initialPositions[i * 3 + 2] = radius * Math.cos(phi);
+    }
+
+    sizes[i] = 0.5 + Math.random() * 0.8;
 
     const type = (row.part_type || "").toLowerCase();
     partTypes[i] = type;
 
     let color: THREE.Color;
     if (type) {
-      const known = PART_TYPE_COLORS[type];
-      if (known) {
-        color = new THREE.Color(known);
+      const knownColor = PART_TYPE_COLORS[type];
+      if (knownColor) {
+        color = new THREE.Color(knownColor);
       } else {
         if (!partMap.has(type)) {
-          partMap.set(type, nextColor++);
+          partMap.set(type, nextIndex++);
         }
         color = fallbackPalette[(partMap.get(type) || 0) % fallbackPalette.length];
       }
     } else {
       const t = THREE.MathUtils.clamp((z + 500) / 1000, 0, 1);
-      color = new THREE.Color().setHSL(0.56 * (1 - t) + 0.02, 0.8, 0.5 + 0.2 * (1 - t));
+      color = new THREE.Color().setHSL(0.6 * (1 - t) + 0.02, 0.6, 0.6 + 0.2 * (1 - t));
     }
 
     colors[i * 3] = color.r;
@@ -330,53 +382,62 @@ function buildGeometryFromRows(rows: DataRow[]) {
     colors[i * 3 + 2] = color.b;
   }
 
+  if (center) {
+    for (let i = 0; i < pointCount; i++) {
+      positions[i * 3] -= center.x;
+      positions[i * 3 + 1] -= center.y;
+      positions[i * 3 + 2] -= center.z;
+    }
+  }
+
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
   geometry.setAttribute("aColor", new THREE.BufferAttribute(colors, 3));
   geometry.setAttribute("aSize", new THREE.BufferAttribute(sizes, 1));
-  geometry.setAttribute("aHighlight", new THREE.BufferAttribute(highlights, 1));
+  geometry.setAttribute(
+    "aInitialPosition",
+    new THREE.BufferAttribute(initialPositions || positions.slice(), 3),
+  );
+  geometry.setAttribute(
+    "aHighlight",
+    new THREE.BufferAttribute(new Float32Array(pointCount), 1),
+  );
   geometry.computeBoundingSphere();
 
-  return {
-    geometry,
-    positions,
-    partTypes,
-  };
+  return { geometry, positions, partTypes };
 }
 
 function PointCloudPicker({
   rows,
   positions,
-  onPointClick,
+  onHover,
 }: {
   rows: DataRow[];
   positions: Float32Array;
-  onPointClick: (point: SelectedPoint) => void;
+  onHover: (point: HoveredPoint | null) => void;
 }) {
   const { camera, gl, size } = useThree();
-  const mouseDownRef = useRef<{ x: number; y: number } | null>(null);
-  const lastHoverCheckRef = useRef<number>(0);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const canvas = gl.domElement;
-    canvas.style.cursor = "grab";
 
-    const findClosestIndex = (
-      mouseX: number,
-      mouseY: number,
-      stride: number = 1,
-      threshold: number = 7,
-    ): number => {
+    const handlePointerMove = (event: PointerEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+
       let closestIndex = -1;
-      let closestScreenDist = Infinity;
+      let closestScreenDistance = Infinity;
       let closestDepth = Infinity;
+      const pixelThreshold = 5;
 
-      for (let i = 0; i < rows.length; i += stride) {
-        const x = positions[i * 3];
-        const y = positions[i * 3 + 1];
-        const z = positions[i * 3 + 2];
-
-        const point = new THREE.Vector3(x, y, z);
+      for (let i = 0; i < rows.length; i++) {
+        const point = new THREE.Vector3(
+          positions[i * 3],
+          positions[i * 3 + 1],
+          positions[i * 3 + 2],
+        );
         const projected = point.clone().project(camera);
 
         if (projected.z >= 1) {
@@ -387,112 +448,138 @@ function PointCloudPicker({
         const screenY = (-(projected.y * 0.5) + 0.5) * size.height;
         const dx = screenX - mouseX;
         const dy = screenY - mouseY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const screenDistance = Math.sqrt(dx * dx + dy * dy);
         const depth = camera.position.distanceTo(point);
 
-        if (distance < threshold) {
-          if (distance < closestScreenDist || (distance === closestScreenDist && depth < closestDepth)) {
-            closestIndex = i;
-            closestScreenDist = distance;
+        if (screenDistance < pixelThreshold) {
+          if (
+            screenDistance < closestScreenDistance ||
+            (screenDistance === closestScreenDistance && depth < closestDepth)
+          ) {
+            closestScreenDistance = screenDistance;
             closestDepth = depth;
+            closestIndex = i;
           }
         }
       }
 
-      return closestIndex;
-    };
-
-    const handlePointerMove = (event: PointerEvent) => {
-      if (mouseDownRef.current) {
-        return;
-      }
-
-      const now = performance.now();
-      if (now - lastHoverCheckRef.current < 45) {
-        return;
-      }
-      lastHoverCheckRef.current = now;
-
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = event.clientX - rect.left;
-      const mouseY = event.clientY - rect.top;
-      const closestIndex = findClosestIndex(mouseX, mouseY, 2, 8);
-
-      canvas.style.cursor = closestIndex >= 0 ? "pointer" : "grab";
-    };
-
-    const handlePointerDown = (event: PointerEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouseDownRef.current = {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
-      };
-      canvas.style.cursor = "grabbing";
-    };
-
-    const handlePointerUp = (event: PointerEvent) => {
-      if (!mouseDownRef.current) {
-        return;
-      }
-
-      const rect = canvas.getBoundingClientRect();
-      const mouseUp = {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
-      };
-
-      const dx = mouseUp.x - mouseDownRef.current.x;
-      const dy = mouseUp.y - mouseDownRef.current.y;
-      const movedDistance = Math.sqrt(dx * dx + dy * dy);
-      mouseDownRef.current = null;
-      canvas.style.cursor = "grab";
-
-      // Ignore drag gestures; only treat near-stationary up/down as click.
-      if (movedDistance > 5) {
-        return;
-      }
-
-      const closestIndex = findClosestIndex(mouseUp.x, mouseUp.y);
-      if (closestIndex < 0) {
-        return;
-      }
-
-      const row = rows[closestIndex];
-      if (row.id == null || row.id === "") {
-        return;
-      }
-      onPointClick({
-        id: row.id,
-        name: String(row.name || row.id || `Point ${closestIndex}`),
-        partType: row.part_type,
-        source: row.source,
-        coordinates: {
-          x: positions[closestIndex * 3],
-          y: positions[closestIndex * 3 + 1],
-          z: positions[closestIndex * 3 + 2],
-        },
-      });
-    };
-
-    const handlePointerLeave = () => {
-      if (!mouseDownRef.current) {
+      if (closestIndex !== -1 && closestIndex !== hoveredIndex) {
+        const row = rows[closestIndex];
+        setHoveredIndex(closestIndex);
+        onHover({
+          id: row.id ?? closestIndex,
+          name: getAmpDisplayName(closestIndex),
+          part_type: row.part_type,
+          source: row.source,
+          position: [
+            positions[closestIndex * 3],
+            positions[closestIndex * 3 + 1],
+            positions[closestIndex * 3 + 2],
+          ],
+        });
+        canvas.style.cursor = "pointer";
+      } else if (closestIndex === -1 && hoveredIndex !== null) {
+        setHoveredIndex(null);
+        onHover(null);
+        canvas.style.cursor = "grab";
+      } else if (closestIndex === -1) {
         canvas.style.cursor = "grab";
       }
     };
 
+    const handlePointerLeave = () => {
+      setHoveredIndex(null);
+      onHover(null);
+      canvas.style.cursor = "grab";
+    };
+
+    canvas.style.cursor = "grab";
     canvas.addEventListener("pointermove", handlePointerMove);
-    canvas.addEventListener("pointerdown", handlePointerDown);
-    canvas.addEventListener("pointerup", handlePointerUp);
     canvas.addEventListener("pointerleave", handlePointerLeave);
 
     return () => {
       canvas.removeEventListener("pointermove", handlePointerMove);
-      canvas.removeEventListener("pointerdown", handlePointerDown);
-      canvas.removeEventListener("pointerup", handlePointerUp);
       canvas.removeEventListener("pointerleave", handlePointerLeave);
       canvas.style.cursor = "default";
     };
-  }, [camera, gl, onPointClick, positions, rows, size.height, size.width]);
+  }, [camera, gl, hoveredIndex, onHover, positions, rows, size.height, size.width]);
+
+  return null;
+}
+
+function HoverLabelProjector({
+  hoveredData,
+  onScreenPosUpdate,
+}: {
+  hoveredData: HoveredPoint | null;
+  onScreenPosUpdate: (position: { x: number; y: number } | null) => void;
+}) {
+  const { camera, size } = useThree();
+
+  useFrame(() => {
+    if (!hoveredData) {
+      onScreenPosUpdate(null);
+      return;
+    }
+
+    const vector = new THREE.Vector3(...hoveredData.position);
+    vector.project(camera);
+
+    const x = (vector.x * 0.5 + 0.5) * size.width;
+    const y = (-(vector.y * 0.5) + 0.5) * size.height;
+
+    if (vector.z < 1) {
+      onScreenPosUpdate({ x, y });
+    } else {
+      onScreenPosUpdate(null);
+    }
+  });
+
+  return null;
+}
+
+function CameraMotionDetector({
+  onCameraMove,
+}: {
+  onCameraMove?: (distance: number) => void;
+}) {
+  const { camera } = useThree();
+  const initialPosition = useRef<THREE.Vector3 | null>(null);
+
+  useFrame(() => {
+    if (initialPosition.current === null) {
+      initialPosition.current = camera.position.clone();
+    }
+
+    if (onCameraMove && initialPosition.current) {
+      onCameraMove(camera.position.distanceTo(initialPosition.current));
+    }
+  });
+
+  return null;
+}
+
+function CameraDistanceController({
+  distance,
+}: {
+  distance?: number;
+}) {
+  const { camera } = useThree();
+
+  useFrame(() => {
+    if (distance == null) {
+      return;
+    }
+
+    const direction = camera.position.clone();
+    if (direction.lengthSq() < 1e-6) {
+      direction.set(0, 0.1, 1);
+    }
+
+    const nextPosition = direction.normalize().multiplyScalar(distance);
+    camera.position.lerp(nextPosition, 0.18);
+    camera.lookAt(0, 0, 0);
+  });
 
   return null;
 }
@@ -500,13 +587,21 @@ function PointCloudPicker({
 function StarPoints({
   rows,
   highlightPartType,
-  onPointClick,
+  onHover,
+  animateConvergence,
+  convergenceProgress,
 }: {
   rows: DataRow[];
   highlightPartType: string | null;
-  onPointClick?: (point: SelectedPoint) => void;
+  onHover: (point: HoveredPoint | null) => void;
+  animateConvergence: boolean;
+  convergenceProgress: number;
 }) {
-  const geometryData = useMemo(() => buildGeometryFromRows(rows), [rows]);
+  const geometryData = useMemo(
+    () => buildGeometryFromRows(rows, animateConvergence),
+    [rows, animateConvergence],
+  );
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
 
   const uniforms = useMemo(
     () => ({
@@ -515,12 +610,20 @@ function StarPoints({
     [],
   );
 
+  useFrame(() => {
+    if (materialRef.current?.uniforms?.uConvergenceProgress) {
+      materialRef.current.uniforms.uConvergenceProgress.value = animateConvergence
+        ? convergenceProgress
+        : 1.0;
+    }
+  });
+
   useEffect(() => {
-    const attr = geometryData.geometry.getAttribute("aHighlight") as THREE.BufferAttribute;
-    const highlights = attr.array as Float32Array;
+    const attribute = geometryData.geometry.getAttribute("aHighlight") as THREE.BufferAttribute;
+    const highlights = attribute.array as Float32Array;
 
     for (let i = 0; i < highlights.length; i++) {
-      if (highlightPartType == null) {
+      if (highlightPartType === null) {
         highlights[i] = 0;
       } else if (geometryData.partTypes[i] === highlightPartType) {
         highlights[i] = 1;
@@ -529,7 +632,7 @@ function StarPoints({
       }
     }
 
-    attr.needsUpdate = true;
+    attribute.needsUpdate = true;
   }, [geometryData, highlightPartType]);
 
   return (
@@ -537,18 +640,16 @@ function StarPoints({
       <points frustumCulled>
         <primitive object={geometryData.geometry} attach="geometry" />
         <shaderMaterial
+          ref={materialRef}
           vertexShader={vertexShader}
           fragmentShader={fragmentShader}
-          blending={THREE.NormalBlending}
+          blending={THREE.AdditiveBlending}
           transparent
-          depthTest={false}
           depthWrite={false}
           uniforms={uniforms}
         />
       </points>
-      {onPointClick && (
-        <PointCloudPicker rows={rows} positions={geometryData.positions} onPointClick={onPointClick} />
-      )}
+      <PointCloudPicker rows={rows} positions={geometryData.positions} onHover={onHover} />
     </>
   );
 }
@@ -558,41 +659,62 @@ export default function PointCloudHero({
   className,
   background = "#02040a",
   showLegend = true,
+  showOverlay = true,
+  enableZoom = true,
+  allowPageScrollOnWheel = false,
+  highlightPartType: controlledHighlightPartType,
+  onHighlightPartTypeChange,
+  partTypeLabels,
+  legendTitle,
+  animateConvergence = false,
+  convergenceProgress = 1.0,
+  controlledCameraDistance,
+  onCameraMove,
 }: PointCloudHeroProps) {
   const { rows, error, loading } = useCSV(csvUrl);
-  const [highlightPartType, setHighlightPartType] = useState<string | null>(null);
-  const [selectedPoint, setSelectedPoint] = useState<SelectedPoint | null>(null);
-  const [infoPanelHeight, setInfoPanelHeight] = useState(0);
+  const [hoveredData, setHoveredData] = useState<HoveredPoint | null>(null);
+  const [screenPos, setScreenPos] = useState<{ x: number; y: number } | null>(null);
+  const [internalHighlightPartType, setInternalHighlightPartType] = useState<string | null>(null);
   const [renderError, setRenderError] = useState<string | null>(null);
-  const [webglSupport, setWebglSupport] = useState<{ supported: boolean; error?: string } | null>(null);
+  const [webglSupport, setWebglSupport] = useState<{ supported: boolean; error?: string } | null>(
+    null,
+  );
+  const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement | null>(null);
+
+  const highlightPartType =
+    controlledHighlightPartType === undefined
+      ? internalHighlightPartType
+      : controlledHighlightPartType;
+
+  const updateHighlightPartType = (nextPartType: string | null) => {
+    if (controlledHighlightPartType === undefined) {
+      setInternalHighlightPartType(nextPartType);
+    }
+    onHighlightPartTypeChange?.(nextPartType);
+  };
 
   useEffect(() => {
     setWebglSupport(checkWebGLSupport());
   }, []);
 
   useEffect(() => {
-    const panel = document.getElementById("hero-what-you-are-seeing");
-    if (!panel) return;
+    if (!canvasElement || !allowPageScrollOnWheel) {
+      return;
+    }
 
-    const updateHeight = () => {
-      setInfoPanelHeight(Math.round(panel.getBoundingClientRect().height));
+    const handleWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      window.scrollBy({ top: event.deltaY, left: 0, behavior: "auto" });
     };
 
-    updateHeight();
-    const observer = new ResizeObserver(updateHeight);
-    observer.observe(panel);
-    window.addEventListener("resize", updateHeight);
+    canvasElement.addEventListener("wheel", handleWheel, { passive: false });
+    return () => canvasElement.removeEventListener("wheel", handleWheel);
+  }, [allowPageScrollOnWheel, canvasElement]);
 
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", updateHeight);
-    };
-  }, []);
-
-  const canRender = webglSupport?.supported !== false && !renderError;
   const legendItems = useMemo(() => {
     if (!rows || rows.length === 0) {
-      return Object.entries(PART_TYPE_COLORS).slice(0, 12) as [string, string][];
+      return [] as Array<[string, string]>;
     }
 
     const counts = new Map<string, number>();
@@ -607,75 +729,122 @@ export default function PointCloudHero({
       .map(([type]) => [type, PART_TYPE_COLORS[type] || fallbackColorForType(type)] as [string, string]);
   }, [rows]);
 
+  const defaultLegendTitle = useMemo(() => {
+    if (!legendItems.length) {
+      return "Part Types";
+    }
+
+    const clusterCount = legendItems.filter(([type]) => type.startsWith("cluster_")).length;
+    return clusterCount >= Math.ceil(legendItems.length / 2) ? "Similarity Clusters" : "Part Types";
+  }, [legendItems]);
+
+  const hoveredTypeLabel =
+    hoveredData?.part_type && hoveredData.part_type.toLowerCase().startsWith("cluster_") ? "Cluster" : "Type";
+
+  const showFallback = (webglSupport && !webglSupport.supported) || renderError !== null;
+  const fallbackMessage =
+    renderError || webglSupport?.error || error || "Unable to render 3D visualization";
+
   return (
-    <div className={cn("relative w-full h-full overflow-hidden", className)}>
-      {canRender && rows && !loading && !error && (
+    <div className={cn("relative h-full w-full overflow-hidden", className)}>
+      {!showFallback && rows && !loading && !error && (
         <div className="absolute inset-0 z-10">
           <StarFieldErrorBoundary
-            onError={(err) => setRenderError(err.message || "Failed to render point cloud")}
+            onError={(caughtError) =>
+              setRenderError(caughtError.message || "An error occurred while rendering the 3D scene")
+            }
           >
             <Canvas
-              camera={{ fov: 70, near: 0.1, far: 5000, position: [0, 26, 320] }}
+              camera={{ fov: 60, near: 0.1, far: 5000, position: [0, 10, 100] }}
               dpr={[1, 2]}
-              gl={{ antialias: false, powerPreference: "high-performance", alpha: true }}
+              gl={{
+                antialias: false,
+                powerPreference: "high-performance",
+                alpha: false,
+                logarithmicDepthBuffer: true,
+              }}
               onCreated={({ gl }) => {
-                gl.setClearColor(new THREE.Color(background), 0);
+                gl.setClearColor(new THREE.Color(background), 1);
+                setCanvasElement(gl.domElement);
               }}
             >
+              <color attach="background" args={[background]} />
               <StarPoints
                 rows={rows}
                 highlightPartType={highlightPartType}
-                onPointClick={setSelectedPoint}
+                onHover={setHoveredData}
+                animateConvergence={animateConvergence}
+                convergenceProgress={convergenceProgress}
               />
+              <HoverLabelProjector hoveredData={hoveredData} onScreenPosUpdate={setScreenPos} />
               <EffectComposer multisampling={0}>
-                <Bloom intensity={0.18} luminanceThreshold={0.2} luminanceSmoothing={0.25} mipmapBlur />
-                <Noise opacity={0.01} />
-                <Vignette eskil={false} offset={0.23} darkness={0.45} />
+                <Bloom
+                  intensity={0.2}
+                  luminanceThreshold={0.05}
+                  luminanceSmoothing={0.2}
+                  mipmapBlur
+                />
+                <Noise opacity={0.05} />
+                <Vignette eskil={false} offset={0.2} darkness={0.6} />
               </EffectComposer>
+              <CameraDistanceController distance={controlledCameraDistance} />
+              <CameraMotionDetector onCameraMove={onCameraMove} />
               <OrbitControls
                 enableDamping
-                dampingFactor={0.08}
+                dampingFactor={0.05}
                 enablePan={false}
-                minDistance={120}
-                maxDistance={900}
-                rotateSpeed={0.9}
-                zoomSpeed={0.9}
+                enableZoom={enableZoom}
+                minDistance={50}
+                maxDistance={600}
               />
             </Canvas>
           </StarFieldErrorBoundary>
         </div>
       )}
 
-      {canRender && rows && !loading && !error && showLegend && (
-        <div className="absolute right-4 top-4 z-30 rounded-lg border border-white/20 bg-black/55 p-3 text-white backdrop-blur-sm">
+      {!showFallback && rows && !loading && !error && showOverlay && (
+        <div className="pointer-events-none absolute left-0 top-0 z-20 p-4 text-sm text-white/80">
+          <div className="font-medium">3D Starfield</div>
+          <div className="opacity-80">Scroll to zoom, drag to orbit</div>
+        </div>
+      )}
+
+      {!showFallback && rows && !loading && !error && showLegend && legendItems.length > 0 && (
+        <div className="absolute right-4 top-4 z-30 rounded-lg border border-white/20 bg-black/60 p-3 text-white backdrop-blur-sm">
           <div className="mb-2 flex items-center justify-between gap-3">
-            <span className="text-xs font-semibold tracking-wide">Similarity Clusters</span>
+            <span className="text-sm font-semibold">{legendTitle || defaultLegendTitle}</span>
             {highlightPartType && (
               <button
                 type="button"
-                onClick={() => setHighlightPartType(null)}
-                className="rounded border border-white/30 px-2 py-0.5 text-[10px] hover:bg-white/10"
+                onClick={() => updateHighlightPartType(null)}
+                className="rounded border border-white/25 px-2 py-0.5 text-[10px] hover:bg-white/10"
               >
                 Clear
               </button>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+          <div className="space-y-1 text-xs">
             {legendItems.map(([type, color]) => {
               const active = highlightPartType === type;
-              const dimmed = highlightPartType != null && !active;
+              const dimmed = highlightPartType !== null && !active;
               return (
                 <button
                   key={type}
                   type="button"
-                  onClick={() => setHighlightPartType(active ? null : type)}
+                  onClick={() => updateHighlightPartType(active ? null : type)}
                   className={cn(
-                    "flex items-center gap-1.5 rounded px-1 py-0.5 text-left text-[10px] capitalize transition-opacity",
-                    dimmed ? "opacity-40" : "opacity-100",
+                    "flex w-full items-center gap-2 rounded px-1 py-0.5 text-left capitalize transition-opacity",
+                    dimmed ? "opacity-35" : "opacity-100",
                   )}
                 >
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
-                  <span>{type.replace("_", " ")}</span>
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{
+                      backgroundColor: color,
+                      boxShadow: `0 0 6px ${color}`,
+                    }}
+                  />
+                  <span>{partTypeLabels?.[type] || type.replace("_", " ")}</span>
                 </button>
               );
             })}
@@ -683,49 +852,34 @@ export default function PointCloudHero({
         </div>
       )}
 
-      {selectedPoint && (
+      {!showFallback && hoveredData && screenPos && (
         <div
-          className="absolute right-4 z-40 w-[min(360px,calc(100%-2rem))] rounded-xl border border-black/15 bg-[#f5efdf]/95 p-4 text-[#3c372c] shadow-xl backdrop-blur-sm"
-          style={{ bottom: `calc(1rem + ${infoPanelHeight}px + 0.75rem)` }}
+          className="pointer-events-none absolute z-40"
+          style={{
+            left: `${screenPos.x}px`,
+            top: `${screenPos.y}px`,
+            transform: "translate(-50%, calc(-100% - 20px))",
+          }}
         >
-          <div className="mb-2 flex items-start justify-between gap-3">
-            <div>
-              <p className="text-[11px] uppercase tracking-wider text-[#6a634f]">AMP Point</p>
-              <h4 className="text-sm font-semibold leading-tight break-all">{selectedPoint.name}</h4>
+          <div className="min-w-[200px] rounded-lg border border-white/50 bg-black/95 px-4 py-3 text-white shadow-2xl">
+            <div className="mb-1 break-all text-base font-semibold leading-tight">{hoveredData.name}</div>
+            <div className="space-y-1 text-sm text-white/80">
+              <div>ID: {hoveredData.id}</div>
+              {hoveredData.part_type && (
+                <div>{hoveredTypeLabel}: {partTypeLabels?.[hoveredData.part_type.toLowerCase()] || hoveredData.part_type.replace("_", " ")}</div>
+              )}
+              {hoveredData.source && <div>Source: {hoveredData.source.replace("_", " ")}</div>}
             </div>
-            <button
-              type="button"
-              onClick={() => setSelectedPoint(null)}
-              className="rounded border border-black/20 px-2 py-0.5 text-xs hover:bg-black/5"
-              aria-label="Close point panel"
-            >
-              Close
-            </button>
-          </div>
-          <div className="space-y-1 text-xs leading-relaxed">
-            <p><span className="font-medium">ID:</span> {selectedPoint.id}</p>
-            <p><span className="font-medium">Cluster:</span> {(selectedPoint.partType || "unknown").replace("_", " ")}</p>
-            <p><span className="font-medium">Source:</span> {(selectedPoint.source || "unknown").replace("_", " ")}</p>
-            <p>
-              <span className="font-medium">Coordinates:</span>{" "}
-              ({selectedPoint.coordinates.x.toFixed(1)}, {selectedPoint.coordinates.y.toFixed(1)}, {selectedPoint.coordinates.z.toFixed(1)})
-            </p>
-            <p className="pt-1 text-[#5b5443]">
-              This point represents one AMP sequence. Points in the same cluster usually share similar sequence composition and physicochemical tendencies.
-            </p>
           </div>
         </div>
       )}
 
-      {(loading || error || renderError || webglSupport?.supported === false) && (
+      {(loading || error || showFallback) && (
         <div
-          className="absolute inset-0 z-20 flex items-center justify-center p-4 text-center text-sm text-black/70"
-          style={{ backgroundColor: background }}
+          className="absolute inset-0 z-50 flex items-center justify-center px-6 text-center text-sm text-white/80"
+          style={{ background }}
         >
-          {loading && <span>Loading 3D point cloud...</span>}
-          {!loading && (error || renderError || webglSupport?.error) && (
-            <span>{error || renderError || webglSupport?.error}</span>
-          )}
+          {loading ? "Loading 3D point cloud..." : fallbackMessage}
         </div>
       )}
     </div>

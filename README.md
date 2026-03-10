@@ -36,19 +36,6 @@ AMP Forge is an antimicrobial peptide (AMP) generation and project-showcase repo
 - Conditional variant modes: `mixed`, `c_sub`, `c_ext`, `c_trunc`, `tag`, `latent`.
 - End-to-end scripts for data prep, training, generation, and evaluation.
 
-## Example Results Snapshot
-
-From a local evaluation run (`n=500` unconditional samples):
-
-| Metric | Value |
-|---|---:|
-| Uniqueness rate | 1.00 |
-| Novelty rate | 1.00 |
-| Mean length | 25.54 |
-| Mean diversity | 0.853 |
-
-Reference output: `esm_diffvae/results/evaluation/evaluation_results.json`
-
 ## Architecture
 
 ```mermaid
@@ -164,21 +151,3 @@ pnpm dev
 - EN: [docs/en/generation.md](./docs/en/generation.md)
 - EN: [docs/en/evaluation.md](./docs/en/evaluation.md)
 - EN: [docs/en/data-pipeline.md](./docs/en/data-pipeline.md)
-
-## Model Weights and Large Artifacts
-
-Large artifacts are intentionally excluded from Git tracking (checkpoints, processed data, embeddings, results, etc.).
-
-- Use GitHub Releases or external object storage for weight sharing.
-- Use [scripts/check_large_files.sh](./scripts/check_large_files.sh) before pushing if needed:
-
-```bash
-bash scripts/check_large_files.sh
-```
-
-## Contributing and Security
-
-- Contribution guide: [CONTRIBUTING.md](./CONTRIBUTING.md)
-- Security policy: [SECURITY.md](./SECURITY.md)
-- Code of conduct: [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
-- Citation metadata: [CITATION.cff](./CITATION.cff)

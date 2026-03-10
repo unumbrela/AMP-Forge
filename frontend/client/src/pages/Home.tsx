@@ -52,7 +52,25 @@ const EVAL_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663390962009/nwNByvtJSze5gMGiNTNhXC/evaluation-pipeline-CkDvrw87vYQELZsHzvSFE7.webp";
 const BG_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663390962009/nwNByvtJSze5gMGiNTNhXC/abstract-peptide-bg-7vmSS9d64cv7cVh5spxu7y.webp";
+const AMP_HOME_BG = "#f8f7f3";
 const REPO_URL = "https://github.com/unumbrela/AMP-Forge";
+const IGEM_LEGEND_ITEMS = [
+  { label: "Cluster A", value: "cds", color: "#ff6b6b" },
+  { label: "Cluster B", value: "composite", color: "#4ecdc4" },
+  { label: "Cluster C", value: "regulatory", color: "#ffe66d" },
+  { label: "Cluster D", value: "dna", color: "#95e1d3" },
+  { label: "Cluster E", value: "protein", color: "#ff8c42" },
+  { label: "Cluster F", value: "rbs", color: "#c44569" },
+  { label: "Cluster G", value: "intermediate", color: "#9b59b6" },
+  { label: "Cluster H", value: "reporter", color: "#3498db" },
+  { label: "Cluster I", value: "promoter", color: "#2ecc71" },
+  { label: "Cluster J", value: "primer", color: "#e74c3c" },
+  { label: "Cluster K", value: "rna", color: "#f39c12" },
+  { label: "Cluster L", value: "generator", color: "#1abc9c" },
+] as const;
+const IGEM_PART_TYPE_LABELS: Record<string, string> = Object.fromEntries(
+  IGEM_LEGEND_ITEMS.map((item) => [item.value, item.label]),
+);
 
 const dataSplit = [
   { split: "Train", value: 22828 },
@@ -291,16 +309,75 @@ function Section({
       initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.55, ease: "easeOut" }}
-      className={`py-16 md:py-24 ${withImageBg ? "relative overflow-hidden" : ""} ${className}`}
+      className={`py-16 md:py-24 ${withImageBg ? "relative" : ""} ${className}`}
     >
       {withImageBg && (
-        <>
-          <div className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.28]" style={{ backgroundImage: `url(${BG_IMG})` }} />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/18 via-background/38 to-background/58" />
-        </>
+        <div className="pointer-events-none absolute inset-0 bg-[rgba(248,247,243,0.10)]" />
       )}
       <div className={withImageBg ? "relative z-10" : ""}>{children}</div>
     </motion.section>
+  );
+}
+
+function SharedPeptideBackground({ children }: { children: ReactNode }) {
+  return (
+    <div className="relative overflow-hidden" style={{ backgroundColor: AMP_HOME_BG }}>
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.42),transparent_40%),radial-gradient(circle_at_bottom,rgba(255,255,255,0.38),transparent_42%)]" />
+        <div
+          className="absolute top-0 left-1/2"
+          style={{
+            width: "min(1180px, 92vw)",
+            height: "clamp(280px, 34vw, 480px)",
+            transform: "translateX(calc(-50% - 2vw))",
+          }}
+        >
+          <div
+            className="absolute inset-0 bg-no-repeat opacity-[0.22]"
+            style={{
+              backgroundImage: `url(${BG_IMG})`,
+              backgroundPosition: "center top",
+              backgroundSize: "contain",
+              WebkitMaskImage:
+                "linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.90) 36%, rgba(0,0,0,0.46) 74%, transparent 100%)",
+              maskImage:
+                "linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.90) 36%, rgba(0,0,0,0.46) 74%, transparent 100%)",
+              WebkitMaskRepeat: "no-repeat",
+              maskRepeat: "no-repeat",
+              WebkitMaskSize: "100% 100%",
+              maskSize: "100% 100%",
+            }}
+          />
+        </div>
+        <div
+          className="absolute bottom-0 left-1/2"
+          style={{
+            width: "min(1120px, 88vw)",
+            height: "clamp(240px, 31vw, 420px)",
+            transform: "translateX(calc(-50% + 3vw)) scaleX(-1)",
+          }}
+        >
+          <div
+            className="absolute inset-0 bg-no-repeat opacity-[0.18]"
+            style={{
+              backgroundImage: `url(${BG_IMG})`,
+              backgroundPosition: "center bottom",
+              backgroundSize: "contain",
+              WebkitMaskImage:
+                "linear-gradient(0deg, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.86) 34%, rgba(0,0,0,0.40) 72%, transparent 100%)",
+              maskImage:
+                "linear-gradient(0deg, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.86) 34%, rgba(0,0,0,0.40) 72%, transparent 100%)",
+              WebkitMaskRepeat: "no-repeat",
+              maskRepeat: "no-repeat",
+              WebkitMaskSize: "100% 100%",
+              maskSize: "100% 100%",
+            }}
+          />
+        </div>
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(248,247,243,0.94)_0%,rgba(248,247,243,0.68)_12%,rgba(248,247,243,0.24)_32%,rgba(248,247,243,0.12)_50%,rgba(248,247,243,0.24)_68%,rgba(248,247,243,0.68)_88%,rgba(248,247,243,0.94)_100%)]" />
+      </div>
+      <div className="relative z-10">{children}</div>
+    </div>
   );
 }
 
@@ -314,9 +391,16 @@ function NavBar({ locale, setLocale }: { locale: Locale; setLocale: (locale: Loc
 
   useEffect(() => {
     const onScroll = () => {
-      setScrolled(window.scrollY > 60);
+      const heroSection = document.getElementById("hero");
+      if (heroSection) {
+        const heroBottom = heroSection.getBoundingClientRect().bottom;
+        setScrolled(heroBottom <= 88);
+      } else {
+        setScrolled(window.scrollY > 60);
+      }
       const sections = [
         "hero",
+        "amp-home",
         "overview",
         "landscape",
         "architecture",
@@ -358,7 +442,9 @@ function NavBar({ locale, setLocale }: { locale: Locale; setLocale: (locale: Loc
       <div className="container flex items-center justify-between h-14 gap-3">
         <a
           href="#hero"
-          className="font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight text-foreground hover:text-primary transition-colors"
+          className={`font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight transition-colors ${
+            scrolled ? "text-foreground hover:text-primary" : "text-white hover:text-white/80"
+          }`}
         >
           AMP Forge
         </a>
@@ -369,8 +455,12 @@ function NavBar({ locale, setLocale }: { locale: Locale; setLocale: (locale: Loc
               href={`#${item.id}`}
               className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
                 activeSection === item.id
-                  ? "text-primary font-medium bg-primary/5"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? scrolled
+                    ? "text-primary font-medium bg-primary/5"
+                    : "bg-white/10 text-white"
+                  : scrolled
+                    ? "text-muted-foreground hover:text-foreground"
+                    : "text-white/70 hover:text-white"
               }`}
             >
               {item.label}
@@ -380,7 +470,11 @@ function NavBar({ locale, setLocale }: { locale: Locale; setLocale: (locale: Loc
         <button
           type="button"
           onClick={() => setLocale(locale === "en" ? "zh" : "en")}
-          className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-md border border-border bg-background hover:bg-secondary transition-colors"
+          className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-md transition-colors ${
+            scrolled
+              ? "border border-border bg-background hover:bg-secondary"
+              : "border border-white/20 bg-black/20 text-white backdrop-blur-sm hover:bg-black/35"
+          }`}
           aria-label={t(locale, "Switch language", "切换语言")}
         >
           <Languages className="w-3.5 h-3.5" />
@@ -391,101 +485,243 @@ function NavBar({ locale, setLocale }: { locale: Locale; setLocale: (locale: Loc
   );
 }
 
-function HeroSection({ locale }: { locale: Locale }) {
+function scrollToSection(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+}
+
+function IGEMPointCloudSection({ locale }: { locale: Locale }) {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [selectedPartType, setSelectedPartType] = useState<string | null>(null);
+
+  useEffect(() => {
+    const updateProgress = () => {
+      const section = sectionRef.current;
+      if (!section) {
+        return;
+      }
+
+      const rect = section.getBoundingClientRect();
+      const totalScrollable = Math.max(section.offsetHeight - window.innerHeight, 1);
+      const nextProgress = Math.min(Math.max(-rect.top / totalScrollable, 0), 1);
+      setProgress(nextProgress);
+    };
+
+    updateProgress();
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress);
+
+    return () => {
+      window.removeEventListener("scroll", updateProgress);
+      window.removeEventListener("resize", updateProgress);
+    };
+  }, []);
+
+  const firstTextVisible = progress < 0.22;
+  const secondTextVisible = progress >= 0.22 && progress < 0.52;
+  const legendVisible = progress >= 0.52;
+  const arrowVisible = progress >= 0.94;
+  const convergenceProgress = Math.min(progress / 0.74, 1);
+  const textStageProgress = Math.min(progress / 0.52, 1);
+  const zoomStageProgress = progress <= 0.52 ? 0 : (progress - 0.52) / 0.48;
+  const controlledCameraDistance = 100 + textStageProgress * 140 + zoomStageProgress * 180;
+
   return (
-    <section id="hero" className="relative min-h-[85vh] flex items-end pb-16 pt-20">
-      <div className="pointer-events-none absolute inset-0 bg-secondary/30" />
-      <div className="absolute inset-0 z-10">
-        <PointCloudHero
-          csvUrl={`${import.meta.env.BASE_URL}amp-all-3d.csv`}
-          className="h-full w-full"
-          background="#e8ddc6"
-          showLegend
-        />
+    <section id="hero" ref={sectionRef} className="relative h-[260vh] bg-[#02040a]">
+      <div className="sticky top-0 h-screen overflow-hidden bg-[#02040a]">
+        <div className="absolute inset-0 z-10">
+          <PointCloudHero
+            csvUrl={`${import.meta.env.BASE_URL}igem-composite-3d.csv`}
+            className="h-full w-full"
+            background="#02040a"
+            showLegend={false}
+            showOverlay={false}
+            enableZoom={false}
+            allowPageScrollOnWheel
+            animateConvergence
+            convergenceProgress={convergenceProgress}
+            controlledCameraDistance={controlledCameraDistance}
+            highlightPartType={selectedPartType}
+            partTypeLabels={IGEM_PART_TYPE_LABELS}
+          />
+        </div>
+        <div className="pointer-events-none absolute inset-0 z-20 bg-[radial-gradient(circle_at_15%_20%,rgba(76,201,240,0.08),transparent_32%),radial-gradient(circle_at_85%_35%,rgba(124,58,237,0.06),transparent_38%),radial-gradient(circle_at_50%_80%,rgba(8,156,55,0.05),transparent_40%)]" />
+
+        <div
+          className={`pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center px-6 text-center transition-opacity duration-300 ${
+            firstTextVisible ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <h1 className="max-w-5xl text-5xl font-extrabold leading-[1.08] tracking-[-0.02em] text-white drop-shadow-[0_0_40px_rgba(255,255,255,0.25)] md:text-7xl">
+            {t(locale, "Lost in Sequence Space", "迷失在序列空间")}
+            <br />
+            {t(locale, "Buried in Candidates", "淹没于海量候选")}
+          </h1>
+          <p className="mt-6 text-xl font-light tracking-[0.02em] text-slate-200 drop-shadow-[0_0_16px_rgba(0,0,0,1)] md:text-3xl">
+            {t(locale, "Finding the right AMP shouldn't be this hard", "找到合适的抗菌肽，不该这么困难")}
+          </p>
+          <div className="mt-8 h-1 w-24 rounded-full bg-gradient-to-r from-[#089c37] to-[#22c55e]" />
+        </div>
+
+        <div
+          className={`pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center px-6 text-center transition-opacity duration-300 ${
+            secondTextVisible ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <h1 className="max-w-5xl text-5xl font-extrabold leading-[1.08] tracking-[-0.02em] text-white drop-shadow-[0_0_40px_rgba(255,255,255,0.25)] md:text-7xl">
+            {t(locale, "Explore AMP Sequence Space", "探索抗菌肽序列空间")}
+          </h1>
+          <p className="mt-6 text-xl font-light tracking-[0.02em] text-slate-200 drop-shadow-[0_0_16px_rgba(0,0,0,1)] md:text-3xl">
+            {t(locale, "Navigate AMP embeddings in 3D space", "在 3D 空间中探索 AMP 的嵌入分布")}
+          </p>
+          <div className="mt-8 h-1 w-24 rounded-full bg-gradient-to-r from-[#089c37] to-[#22c55e]" />
+        </div>
+
+        <div
+          className={`absolute right-4 bottom-24 z-30 w-[calc(100%-2rem)] max-w-[200px] rounded-xl border border-white/20 bg-black/70 p-4 text-white shadow-[0_20px_60px_rgba(0,0,0,0.45)] backdrop-blur-md transition-opacity duration-500 md:top-1/2 md:bottom-auto md:-translate-y-1/2 ${
+            legendVisible ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+        >
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div className="text-sm font-semibold">AMP Clusters</div>
+            {selectedPartType && (
+              <button
+                type="button"
+                className="rounded border border-white/20 px-2 py-0.5 text-[10px] transition hover:bg-white/10"
+                onClick={() => setSelectedPartType(null)}
+                title="Clear filter"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          <div className="space-y-1">
+            {IGEM_LEGEND_ITEMS.map((item) => {
+              const active = selectedPartType === item.value;
+              const dimmed = selectedPartType !== null && !active;
+
+              return (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => setSelectedPartType(active ? null : item.value)}
+                  className={`flex w-full items-center gap-2 rounded px-1 py-0.5 text-left text-xs transition-opacity ${
+                    dimmed ? "opacity-35" : "opacity-100"
+                  }`}
+                >
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{
+                      backgroundColor: item.color,
+                      boxShadow: `0 0 8px ${item.color}`,
+                    }}
+                  />
+                  <span>{item.label.replace("_", " ")}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-4 text-[11px] leading-relaxed text-white/70">
+            {t(locale, "Keep scrolling to zoom out", "继续下滑会继续缩小点云")}
+            <br />
+            {t(locale, "Drag to move around", "拖拽可旋转查看")}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => scrollToSection("amp-home")}
+          className={`absolute bottom-8 left-1/2 z-30 flex h-12 w-12 -translate-x-1/2 items-center justify-center rounded-full border-2 border-white/50 bg-white/15 text-white backdrop-blur-md transition hover:bg-white/30 ${
+            arrowVisible ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+          aria-label={t(locale, "Scroll to project homepage", "滚动到项目主页")}
+        >
+          <ChevronDown className="h-5 w-5 animate-bounce" />
+        </button>
       </div>
-      <div
-        id="hero-what-you-are-seeing"
-        className="pointer-events-none absolute right-4 bottom-4 z-30 max-w-sm rounded-lg border border-white/35 bg-black/45 p-3 text-[11px] leading-relaxed text-white/95 shadow-lg backdrop-blur-sm md:text-xs"
-      >
-        <p className="font-semibold tracking-wide mb-1">
-          {t(locale, "What You Are Seeing", "图示说明")}
-        </p>
-        <p>
-          {t(
-            locale,
-            "Each point is one AMP sequence projected from sequence-feature space. Nearby points usually share similar composition and physicochemical patterns.",
-            "每个点代表一条抗菌肽序列在特征空间中的投影位置，越接近通常表示组成与理化性质越相似。"
-          )}
-        </p>
-        <p className="mt-1">
-          {t(
-            locale,
-            "Color indicates sequence-similarity clusters. Drag to rotate, scroll to zoom, and click a point to view cluster and source details.",
-            "颜色表示序列相似性簇。拖拽旋转、滚轮缩放，点击单个点可查看该点的簇和来源信息。"
-          )}
-        </p>
-      </div>
-      <div className="container pointer-events-none relative z-20">
+    </section>
+  );
+}
+
+function AmpHeroSection({ locale }: { locale: Locale }) {
+  return (
+    <section
+      id="amp-home"
+      className="relative flex min-h-[92vh] items-end overflow-hidden pb-16 pt-24"
+      style={{ backgroundColor: AMP_HOME_BG }}
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.32)_0%,rgba(248,247,243,0.35)_100%)]" />
+      <div className="container relative z-10">
         <div className="max-w-4xl">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-sm uppercase tracking-[0.2em] text-primary font-medium mb-6"
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-120px" }}
+            transition={{ delay: 0.05 }}
+            className="mb-6 text-sm font-medium uppercase tracking-[0.2em] text-primary"
           >
             {t(locale, "AMP Forge · Project Homepage · 2026", "AMP Forge · 项目主页 · 2026")}
           </motion.p>
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.8 }}
-            className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-8 text-foreground"
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-120px" }}
+            transition={{ delay: 0.12, duration: 0.75 }}
+            className="mb-8 text-4xl font-bold leading-[1.08] text-foreground md:text-6xl lg:text-7xl"
           >
             {t(locale, "Antimicrobial Peptide Generation", "抗菌肽生成项目")}
             <br />
-            <span className="text-primary">{t(locale, "From Research to Deployable System", "从研究到可落地系统")}</span>
+            <span className="text-primary">
+              {t(locale, "From Research to Deployable System", "从研究到可落地系统")}
+            </span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55 }}
-            className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mb-10"
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-120px" }}
+            transition={{ delay: 0.2 }}
+            className="mb-10 max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl"
           >
             {t(
               locale,
               "Antimicrobial resistance keeps rising, while wet-lab AMP discovery remains costly, slow, and low-coverage. AMP Forge turns this challenge into an end-to-end reproducible system and tells one coherent story: problem context, method gaps, our design, and real outputs.",
-              "抗生素耐药问题持续加剧，而湿实验筛选抗菌肽成本高、周期长、覆盖有限。AMP Forge 以“可复现工程”为中心，把项目背景、方法对比、模型实现与真实生成结果串成一条完整叙事链。"
+              "抗生素耐药问题持续加剧，而湿实验筛选抗菌肽成本高、周期长、覆盖有限。AMP Forge 以可复现工程为中心，把项目背景、方法对比、模型实现与真实生成结果串成一条完整叙事链。"
             )}
           </motion.p>
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.75 }}
-            className="flex flex-wrap gap-3 text-sm text-muted-foreground"
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: "-120px" }}
+            transition={{ delay: 0.28 }}
+            className="flex flex-wrap gap-3 text-sm"
           >
-            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary">
-              <Database className="w-3.5 h-3.5" /> {t(locale, "28,536 training-ready sequences", "28,536 条训练级序列")}
+            <span className="flex items-center gap-1.5 rounded-full border border-border/70 bg-background/60 px-3 py-1.5 text-muted-foreground">
+              <Database className="h-3.5 w-3.5" /> {t(locale, "28,536 training-ready sequences", "28,536 条训练级序列")}
             </span>
-            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary">
-              <Layers className="w-3.5 h-3.5" /> ESM + VAE + Latent Diffusion
+            <span className="flex items-center gap-1.5 rounded-full border border-border/70 bg-background/60 px-3 py-1.5 text-muted-foreground">
+              <Layers className="h-3.5 w-3.5" /> ESM + VAE + Latent Diffusion
             </span>
-            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary">
-              <Workflow className="w-3.5 h-3.5" /> {t(locale, "Train-Generate-Evaluate loop", "训练-生成-评估闭环")}
+            <span className="flex items-center gap-1.5 rounded-full border border-border/70 bg-background/60 px-3 py-1.5 text-muted-foreground">
+              <Workflow className="h-3.5 w-3.5" /> {t(locale, "Train-Generate-Evaluate loop", "训练-生成-评估闭环")}
             </span>
-            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary">
-              <Sparkles className="w-3.5 h-3.5" /> {t(locale, "Controllable variant generation", "可控变体生成")}
+            <span className="flex items-center gap-1.5 rounded-full border border-border/70 bg-background/60 px-3 py-1.5 text-muted-foreground">
+              <Sparkles className="h-3.5 w-3.5" /> {t(locale, "Controllable variant generation", "可控变体生成")}
             </span>
           </motion.div>
         </div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
-          <ChevronDown className="w-5 h-5 text-muted-foreground animate-bounce" />
-        </motion.div>
       </div>
+      <motion.button
+        type="button"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.35 }}
+        onClick={() => scrollToSection("overview")}
+        className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 items-center justify-center text-muted-foreground transition hover:text-foreground"
+        aria-label={t(locale, "Scroll to project overview", "滚动到项目概览")}
+      >
+        <ChevronDown className="h-5 w-5 animate-bounce" />
+      </motion.button>
     </section>
   );
 }
@@ -1160,15 +1396,18 @@ export default function Home() {
   return (
     <div className="min-h-screen" lang={locale === "zh" ? "zh-CN" : "en"}>
       <NavBar locale={locale} setLocale={setLocale} />
-      <HeroSection locale={locale} />
-      <OverviewSection locale={locale} />
-      <LandscapeSection locale={locale} />
-      <ArchitectureSection locale={locale} />
-      <DataTrainingSection locale={locale} />
-      <GenerationSection locale={locale} />
-      <EvaluationSection locale={locale} />
-      <RoadmapSection locale={locale} />
-      <ReferencesSection locale={locale} />
+      <IGEMPointCloudSection locale={locale} />
+      <AmpHeroSection locale={locale} />
+      <SharedPeptideBackground>
+        <OverviewSection locale={locale} />
+        <LandscapeSection locale={locale} />
+        <ArchitectureSection locale={locale} />
+        <DataTrainingSection locale={locale} />
+        <GenerationSection locale={locale} />
+        <EvaluationSection locale={locale} />
+        <RoadmapSection locale={locale} />
+        <ReferencesSection locale={locale} />
+      </SharedPeptideBackground>
       <Footer locale={locale} />
     </div>
   );
