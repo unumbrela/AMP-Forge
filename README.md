@@ -9,9 +9,9 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](./esm_diffvae/requirements.txt)
 [![Node](https://img.shields.io/badge/Node-20%2B-339933?logo=node.js&logoColor=white)](./frontend/package.json)
 [![pnpm](https://img.shields.io/badge/pnpm-10-F69220?logo=pnpm&logoColor=white)](./frontend/package.json)
-[![GitHub Pages](https://img.shields.io/badge/Demo-GitHub%20Pages-222222?logo=github&logoColor=white)](https://unumbrela.github.io/amp-research2/)
+[![GitHub Pages](https://img.shields.io/badge/Demo-GitHub%20Pages-222222?logo=github&logoColor=white)](https://unumbrela.github.io/AMP-Forge/)
 
-AMP Forge is an antimicrobial peptide (AMP) generation project focused on a practical and extensible workflow for:
+AMP Forge is an antimicrobial peptide (AMP) generation and project-showcase repository built around a practical, extensible workflow for:
 
 - de novo AMP generation,
 - controlled variant design from parent sequences,
@@ -19,7 +19,8 @@ AMP Forge is an antimicrobial peptide (AMP) generation project focused on a prac
 
 ## Live Demo
 
-- Project page: [https://unumbrela.github.io/amp-research2/](https://unumbrela.github.io/amp-research2/)
+- Repository: [https://github.com/unumbrela/AMP-Forge](https://github.com/unumbrela/AMP-Forge)
+- Project page: [https://unumbrela.github.io/AMP-Forge/](https://unumbrela.github.io/AMP-Forge/)
 
 ## Quick Links
 

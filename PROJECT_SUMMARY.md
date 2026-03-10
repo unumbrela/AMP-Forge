@@ -4,7 +4,9 @@
 
 **AMP Forge** 是一个通用抗菌肽 (Antimicrobial Peptide, AMP) 生成项目，核心目标是构建"可用、可扩展、可验证"的 AMP 序列设计工作流。项目基于 **ESM-DiffVAE v8** 架构——一个融合蛋白质语言模型 (PLM) 表征、变分自编码器 (VAE) 和潜在空间扩散模型 (Latent Diffusion) 的深度生成模型。
 
-**仓库地址**: GitHub Pages 展示页 — https://unumbrela.github.io/amp-research2/
+**仓库地址**: GitHub — https://github.com/unumbrela/AMP-Forge
+
+**项目页面**: GitHub Pages — https://unumbrela.github.io/AMP-Forge/
 
 ---
 

@@ -4,8 +4,8 @@ message: "If you use this project in your research, please cite it as follows."
 type: software
 authors:
   - name: "unumbrela"
-repository-code: "https://github.com/unumbrela/amp-research2"
-url: "https://github.com/unumbrela/amp-research2"
+repository-code: "https://github.com/unumbrela/AMP-Forge"
+url: "https://github.com/unumbrela/AMP-Forge"
 abstract: "AMP Forge is an antimicrobial peptide generation project based on PLM embeddings, VAE, and latent diffusion."
 keywords:
   - antimicrobial peptides

@@ -52,6 +52,7 @@ const EVAL_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663390962009/nwNByvtJSze5gMGiNTNhXC/evaluation-pipeline-CkDvrw87vYQELZsHzvSFE7.webp";
 const BG_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663390962009/nwNByvtJSze5gMGiNTNhXC/abstract-peptide-bg-7vmSS9d64cv7cVh5spxu7y.webp";
+const REPO_URL = "https://github.com/unumbrela/AMP-Forge";
 
 const dataSplit = [
   { split: "Train", value: 22828 },
@@ -555,7 +556,7 @@ function OverviewSection({ locale }: { locale: Locale }) {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <a
-                href="https://github.com/unumbrela/amp-research2"
+                href={REPO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
@@ -1018,12 +1019,12 @@ function LandscapeSection({ locale }: { locale: Locale }) {
               <p className="font-medium text-foreground mb-1">{t(locale, "Main Repository", "核心仓库")}</p>
               <p>
                 <a
-                  href="https://github.com/unumbrela/amp-research2"
+                  href={REPO_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-primary hover:underline"
                 >
-                  unumbrela/amp-research2 <ExternalLink className="w-3 h-3" />
+                  unumbrela/AMP-Forge <ExternalLink className="w-3 h-3" />
                 </a>
               </p>
             </div>
