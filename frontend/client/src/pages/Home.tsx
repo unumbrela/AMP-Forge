@@ -1156,7 +1156,7 @@ function EvaluationSection({ locale }: { locale: Locale }) {
     },
     {
       label: { en: "Multi-Seed Snapshot Ensemble", zh: "多种子快照集成" },
-      detail: { en: "3 random seeds \u00d7 7 top-checkpoint snapshots = 21-model ensemble for robust prediction with post-hoc linear calibration", zh: "3 随机种子 \u00d7 7 最优检查点快照 = 21 模型集成，结合训练后线性校准实现稳健预测" },
+      detail: { en: "3 random seeds × 7 top-checkpoint snapshots = 21-model ensemble for robust prediction with post-hoc linear calibration", zh: "3 随机种子 × 7 最优检查点快照 = 21 模型集成，结合训练后线性校准实现稳健预测" },
     },
   ];
 
@@ -1185,7 +1185,7 @@ function EvaluationSection({ locale }: { locale: Locale }) {
           <p className="text-sm text-muted-foreground mb-4">
             {t(
               locale,
-              "To close this loop, we developed ESM-MIC — a dedicated MIC prediction model trained on ~5,300 experimentally validated AMP\u2013MIC pairs from our curated cross-database corpus. With a Pearson correlation of 0.90 on held-out data, ESM-MIC serves as a reliable in-silico oracle for evaluating AMP Forge\u2019s outputs.",
+              "To close this loop, we developed ESM-MIC — a dedicated MIC prediction model trained on ~5,300 experimentally validated AMP–MIC pairs from our curated cross-database corpus. With a Pearson correlation of 0.90 on held-out data, ESM-MIC serves as a reliable in-silico oracle for evaluating AMP Forge’s outputs.",
               "为了闭合这一环路，我们开发了 ESM-MIC——一个专门的 MIC 预测模型，基于我们策划的跨数据库语料库中约 5300 对经实验验证的 AMP-MIC 数据训练。在留出数据上皮尔逊相关系数达到 0.90，ESM-MIC 可作为评估 AMP Forge 生成结果的可靠计算预言器。"
             )}
           </p>
@@ -1258,8 +1258,8 @@ function EvaluationSection({ locale }: { locale: Locale }) {
                   <p className="text-xs text-muted-foreground">
                     {t(
                       locale,
-                      "3 random seeds \u00d7 7 top checkpoints = 21-model ensemble. Different train/val splits introduce model diversity, pushing PCC from 0.89 past 0.90 with zero extra architecture cost.",
-                      "3 随机种子 \u00d7 7 最优检查点 = 21 模型集成。不同的训练/验证划分引入模型多样性，将 PCC 从 0.89 推至 0.90 以上，无额外架构成本。"
+                      "3 random seeds × 7 top checkpoints = 21-model ensemble. Different train/val splits introduce model diversity, pushing PCC from 0.89 past 0.90 with zero extra architecture cost.",
+                      "3 随机种子 × 7 最优检查点 = 21 模型集成。不同的训练/验证划分引入模型多样性，将 PCC 从 0.89 推至 0.90 以上，无额外架构成本。"
                     )}
                   </p>
                 </div>
@@ -1275,7 +1275,7 @@ function EvaluationSection({ locale }: { locale: Locale }) {
               <p className="text-xs text-muted-foreground mt-1">{t(locale, "21-model multi-seed ensemble", "21 模型多种子集成")}</p>
             </div>
             <div className="bg-card rounded-lg border border-border p-5">
-              <p className="text-xs uppercase tracking-wider text-muted-foreground">R\u00b2</p>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">R²</p>
               <p className="text-2xl font-bold text-primary mt-1">0.8124</p>
               <p className="text-xs text-muted-foreground mt-1">{t(locale, "Strong explanatory power", "强解释力")}</p>
             </div>
@@ -1287,7 +1287,7 @@ function EvaluationSection({ locale }: { locale: Locale }) {
             <div className="bg-card rounded-lg border border-border p-5">
               <p className="text-xs uppercase tracking-wider text-muted-foreground">RMSE</p>
               <p className="text-2xl font-bold text-primary mt-1">0.574</p>
-              <p className="text-xs text-muted-foreground mt-1">{t(locale, "log\u2081\u2080 \u00b5M — within ~4\u00d7 of true concentration", "log\u2081\u2080 \u00b5M——与真实浓度误差约 4 倍以内")}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t(locale, "log₁₀ µM — within ~4× of true concentration", "log₁₀ µM——与真实浓度误差约 4 倍以内")}</p>
             </div>
           </div>
         </div>
@@ -1310,29 +1310,29 @@ function EvaluationSection({ locale }: { locale: Locale }) {
               <div className="bg-card rounded-lg border border-border p-5">
                 <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Potent Sequences", "高效力序列")}</p>
                 <p className="text-2xl font-bold text-primary mt-1">93%</p>
-                <p className="text-xs text-muted-foreground mt-1">{t(locale, "Predicted MIC < 10 \u00b5M (vs. 62% in training data)", "预测 MIC < 10 \u00b5M（训练数据中为 62%）")}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t(locale, "Predicted MIC < 10 µM (vs. 62% in training data)", "预测 MIC < 10 µM（训练数据中为 62%）")}</p>
               </div>
               <div className="bg-card rounded-lg border border-border p-5">
                 <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Highly Potent", "极高效力")}</p>
                 <p className="text-2xl font-bold text-primary mt-1">70%</p>
-                <p className="text-xs text-muted-foreground mt-1">{t(locale, "Predicted MIC < 1 \u00b5M — sub-micromolar potency", "预测 MIC < 1 \u00b5M——亚微摩尔级效力")}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t(locale, "Predicted MIC < 1 µM — sub-micromolar potency", "预测 MIC < 1 µM——亚微摩尔级效力")}</p>
               </div>
               <div className="bg-card rounded-lg border border-border p-5">
                 <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Median MIC", "中位 MIC")}</p>
-                <p className="text-2xl font-bold text-primary mt-1">0.29 \u00b5M</p>
+                <p className="text-2xl font-bold text-primary mt-1">0.29 µM</p>
                 <p className="text-xs text-muted-foreground mt-1">{t(locale, "Across 100 generated sequences", "100 条生成序列的中位值")}</p>
               </div>
               <div className="bg-card rounded-lg border border-border p-5">
                 <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Best Candidate", "最优候选")}</p>
-                <p className="text-2xl font-bold text-primary mt-1">0.01 \u00b5M</p>
+                <p className="text-2xl font-bold text-primary mt-1">0.01 µM</p>
                 <p className="text-xs text-muted-foreground mt-1">{t(locale, "Top-1 predicted MIC — nanomolar potency", "Top-1 预测 MIC——纳摩尔级效力")}</p>
               </div>
             </div>
             <p className="text-xs text-muted-foreground italic">
               {t(
                 locale,
-                "The generated set shows a strong shift toward low-MIC (high potency) compared to the training distribution: 93% of de novo sequences are predicted potent (MIC < 10 \u00b5M), versus only 62% in the original training corpus. This indicates that the latent diffusion model has learned to sample preferentially from the high-potency region of sequence space.",
-                "相比训练数据分布，生成集合表现出明显的低 MIC（高效力）偏移：93% 的从头生成序列被预测为高效（MIC < 10 \u00b5M），而原始训练语料中仅为 62%。这表明潜空间扩散模型已经学会优先从序列空间的高效力区域采样。"
+                "The generated set shows a strong shift toward low-MIC (high potency) compared to the training distribution: 93% of de novo sequences are predicted potent (MIC < 10 µM), versus only 62% in the original training corpus. This indicates that the latent diffusion model has learned to sample preferentially from the high-potency region of sequence space.",
+                "相比训练数据分布，生成集合表现出明显的低 MIC（高效力）偏移：93% 的从头生成序列被预测为高效（MIC < 10 µM），而原始训练语料中仅为 62%。这表明潜空间扩散模型已经学会优先从序列空间的高效力区域采样。"
               )}
             </p>
           </div>
@@ -1343,7 +1343,7 @@ function EvaluationSection({ locale }: { locale: Locale }) {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
               <div className="bg-card rounded-lg border border-border p-5">
                 <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Parent LL-37 MIC", "母体 LL-37 MIC")}</p>
-                <p className="text-2xl font-bold text-muted-foreground mt-1">39.3 \u00b5M</p>
+                <p className="text-2xl font-bold text-muted-foreground mt-1">39.3 µM</p>
                 <p className="text-xs text-muted-foreground mt-1">{t(locale, "Predicted MIC of wild-type LL-37", "野生型 LL-37 的预测 MIC")}</p>
               </div>
               <div className="bg-card rounded-lg border border-border p-5">
@@ -1353,8 +1353,8 @@ function EvaluationSection({ locale }: { locale: Locale }) {
               </div>
               <div className="bg-card rounded-lg border border-border p-5">
                 <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Best Variant MIC", "最优变体 MIC")}</p>
-                <p className="text-2xl font-bold text-primary mt-1">0.30 \u00b5M</p>
-                <p className="text-xs text-muted-foreground mt-1">{t(locale, "~130\u00d7 improvement over parent LL-37", "相比母体 LL-37 提升约 130 倍")}</p>
+                <p className="text-2xl font-bold text-primary mt-1">0.30 µM</p>
+                <p className="text-xs text-muted-foreground mt-1">{t(locale, "~130× improvement over parent LL-37", "相比母体 LL-37 提升约 130 倍")}</p>
               </div>
             </div>
 
@@ -1371,11 +1371,11 @@ function EvaluationSection({ locale }: { locale: Locale }) {
                 </thead>
                 <tbody>
                   {[
-                    { rank: 1, mode: "latent", identity: "60.9%", mic: "0.30 \u00b5M", fold: "131\u00d7" },
-                    { rank: 2, mode: "latent", identity: "52.2%", mic: "0.63 \u00b5M", fold: "62\u00d7" },
-                    { rank: 3, mode: "latent", identity: "47.8%", mic: "1.17 \u00b5M", fold: "34\u00d7" },
-                    { rank: 4, mode: "latent", identity: "56.5%", mic: "1.76 \u00b5M", fold: "22\u00d7" },
-                    { rank: 5, mode: "tag", identity: "67.6%", mic: "5.83 \u00b5M", fold: "6.7\u00d7" },
+                    { rank: 1, mode: "latent", identity: "60.9%", mic: "0.30 µM", fold: "131×" },
+                    { rank: 2, mode: "latent", identity: "52.2%", mic: "0.63 µM", fold: "62×" },
+                    { rank: 3, mode: "latent", identity: "47.8%", mic: "1.17 µM", fold: "34×" },
+                    { rank: 4, mode: "latent", identity: "56.5%", mic: "1.76 µM", fold: "22×" },
+                    { rank: 5, mode: "tag", identity: "67.6%", mic: "5.83 µM", fold: "6.7×" },
                   ].map((row, i) => (
                     <tr key={i} className={`border-t border-border ${i % 2 === 0 ? "bg-card" : ""}`}>
                       <td className="px-4 py-2.5 font-medium text-primary">#{row.rank}</td>
@@ -1386,11 +1386,11 @@ function EvaluationSection({ locale }: { locale: Locale }) {
                     </tr>
                   ))}
                   <tr className="border-t border-border bg-secondary/30">
-                    <td className="px-4 py-2.5 text-muted-foreground">\u2014</td>
+                    <td className="px-4 py-2.5 text-muted-foreground">—</td>
                     <td className="px-4 py-2.5 text-muted-foreground italic">{t(locale, "parent (LL-37)", "母体（LL-37）")}</td>
                     <td className="px-4 py-2.5 text-muted-foreground">100%</td>
-                    <td className="px-4 py-2.5 text-muted-foreground">39.3 \u00b5M</td>
-                    <td className="px-4 py-2.5 text-muted-foreground">1\u00d7</td>
+                    <td className="px-4 py-2.5 text-muted-foreground">39.3 µM</td>
+                    <td className="px-4 py-2.5 text-muted-foreground">1×</td>
                   </tr>
                 </tbody>
               </table>
@@ -1398,7 +1398,7 @@ function EvaluationSection({ locale }: { locale: Locale }) {
             <p className="text-xs text-muted-foreground italic">
               {t(
                 locale,
-                "The latent perturbation mode produces the most potent variants by exploring a broader region of sequence space, with the best variant achieving a ~130-fold MIC reduction over wild-type LL-37. This confirms that AMP Forge\u2019s conditional generation modes can effectively optimize known AMPs for enhanced antimicrobial potency.",
+                "The latent perturbation mode produces the most potent variants by exploring a broader region of sequence space, with the best variant achieving a ~130-fold MIC reduction over wild-type LL-37. This confirms that AMP Forge’s conditional generation modes can effectively optimize known AMPs for enhanced antimicrobial potency.",
                 "潜空间扰动模式通过探索更广阔的序列空间区域产生了最强效的变体，最优变体实现了相比野生型 LL-37 约 130 倍的 MIC 降低。这证实了 AMP Forge 的条件生成模式能够有效优化已知 AMP，提升抗菌效力。"
               )}
             </p>
