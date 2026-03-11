@@ -1,0 +1,89 @@
+# ESM-MIC: MIC Prediction Configuration
+
+# Data
+data:
+  processed_csv: "data/processed/all.csv"
+  grampa_csv: "mic_prediction/data/grampa_clean.csv"  # kept for reference; not used
+  max_seq_len: 50
+  min_seq_len: 5
+  test_ratio: 0.1
+  val_ratio: 0.1
+  random_seed: 42
+  oof_residual_threshold: 1.5   # drop samples with OOF |residual| > this
+
+# ESM-2 Backbone
+esm:
+  model_name: "facebook/esm2_t12_35M_UR50D"   # 35M param, 480-dim embeddings
+  embedding_dim: 480
+  freeze_layers: 8
+  gradient_checkpointing: false
+
+# Physicochemical Features
+physchem:
+  enabled: true
+  dim: 11
+
+# Model Architecture — Gated Multi-branch
+model:
+  # Multi-pool aggregator (mean/max/std + multi-head attention)
+  pool_n_heads: 4
+  pool_dropout: 0.1
+  pool_bottleneck_dims: [256, 128]   # two-stage: 1920 -> 256 -> 128
+
+  # Multi-scale CNN branch
+  cnn_channels: 64
+  cnn_kernels: [3, 5, 7]
+  cnn_dropout: 0.3
+
+  # Physicochemical encoder
+  physchem_hidden: 32
+
+  # Gated fusion
+  gate_dim: 128
+
+  # Residual fusion MLP
+  fusion_hidden_dims: [256, 128]
+  fusion_dropout: 0.4
+
+  # Output
+  output_dim: 1
+
+# Training
+training:
+  epochs: 300
+  batch_size: 64
+  lr: 5.0e-4
+  weight_decay: 5.0e-3
+  grad_clip: 1.0
+  warmup_epochs: 10
+  scheduler: "cosine"
+  patience: 40
+  fp16: true
+
+  # Snapshot ensemble: keep top-K checkpoints by val PCC
+  snapshot_k: 7
+
+  # Data augmentation
+  augmentation:
+    noise_std: 0.05
+    residue_mask_prob: 0.15
+    label_noise_std: 0.05
+    mixup_alpha: 0.3
+
+  # Loss
+  loss: "huber"
+  huber_delta: 1.0
+
+  # Cross-validation
+  n_folds: 5
+  use_cv: false
+
+# Evaluation
+evaluation:
+  metrics: ["pearson", "spearman", "rmse", "mae", "r2"]
+
+# Paths
+paths:
+  checkpoint_dir: "mic_prediction/checkpoints"
+  results_dir: "mic_prediction/results"
+  data_dir: "mic_prediction/data"

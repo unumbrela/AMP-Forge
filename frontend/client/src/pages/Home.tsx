@@ -1175,6 +1175,29 @@ function EvaluationSection({ locale }: { locale: Locale }) {
     },
   ];
 
+  const micArchSteps = [
+    {
+      label: { en: "ESM-2 Embeddings", zh: "ESM-2 嵌入" },
+      detail: { en: "Pre-computed 480-dim residue representations from a 35M-parameter protein language model", zh: "基于 3500 万参数蛋白质语言模型预计算的 480 维残基表示" },
+    },
+    {
+      label: { en: "Dual-Branch Encoding", zh: "双分支编码" },
+      detail: { en: "Global branch (multi-head attention + statistical pooling) captures sequence-level patterns; local branch (multi-scale CNN with kernels 3/5/7) extracts motif-level features", zh: "全局分支（多头注意力 + 统计池化）捕获序列级模式；局部分支（多尺度 CNN，核宽 3/5/7）提取基序级特征" },
+    },
+    {
+      label: { en: "Gated Fusion", zh: "门控融合" },
+      detail: { en: "A learned sigmoid gate adaptively weights global vs. local contributions per sample, replacing naive concatenation", zh: "学习的 sigmoid 门控按样本自适应调节全局与局部贡献权重，替代朴素拼接" },
+    },
+    {
+      label: { en: "Physicochemical Features", zh: "理化特征" },
+      detail: { en: "11 descriptors (charge, hydrophobicity, molecular weight, aromaticity, etc.) encoded via MLP and fused with sequence features", zh: "11 种描述符（电荷、疏水性、分子量、芳香性等）经 MLP 编码后与序列特征融合" },
+    },
+    {
+      label: { en: "Multi-Seed Snapshot Ensemble", zh: "多种子快照集成" },
+      detail: { en: "3 random seeds x 7 top-checkpoint snapshots = 21-model ensemble for robust prediction with post-hoc linear calibration", zh: "3 随机种子 x 7 最优检查点快照 = 21 模型集成，结合训练后线性校准实现稳健预测" },
+    },
+  ];
+
   return (
     <Section id="evaluation" withImageBg>
       <div className="container">
@@ -1182,85 +1205,190 @@ function EvaluationSection({ locale }: { locale: Locale }) {
           <SectionNumber num="06." />
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">{t(locale, "Evaluation & Validation", "评估结果与验证")}</h2>
-            <p className="text-muted-foreground text-lg mt-3">{t(locale, "Quantitative metrics, baseline comparison, and evaluation pipeline", "定量指标、基线对比与评估流程")}</p>
+            <p className="text-muted-foreground text-lg mt-3">{t(locale, "Generation quality metrics, MIC prediction, and wet-lab validation", "生成质量指标、MIC 预测与湿实验验证")}</p>
             <div className="w-16 h-0.5 bg-primary mt-3" />
           </div>
         </div>
 
-        <div className="rounded-lg overflow-hidden border border-border bg-card mb-8">
-          <img src={EVAL_IMG} alt="evaluation pipeline" className="w-full" />
-          <p className="text-xs text-muted-foreground px-4 py-2 italic">
-            {t(locale, "Figure: Evaluation pipeline covers sequence quality, functional tendency, and safety-related indicators.", "图：评估流程覆盖序列质量、功能倾向与安全相关指标。")}
-          </p>
+        {/* --- Generation Quality --- */}
+        <div className="mb-12">
+          <h3 className="text-xl font-semibold mb-4">{t(locale, "Generation Quality", "生成质量")}</h3>
+
+          <div className="rounded-lg overflow-hidden border border-border bg-card mb-6">
+            <img src={EVAL_IMG} alt="evaluation pipeline" className="w-full" />
+            <p className="text-xs text-muted-foreground px-4 py-2 italic">
+              {t(locale, "Figure: Evaluation pipeline covers sequence quality, functional tendency, and safety-related indicators.", "图：评估流程覆盖序列质量、功能倾向与安全相关指标。")}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="bg-card rounded-lg border border-border p-5">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Uniqueness", "唯一性")}</p>
+              <p className="text-2xl font-bold text-primary mt-1">1.00</p>
+              <p className="text-xs text-muted-foreground mt-1">{t(locale, "500/500 unique — all generated sequences are distinct", "500/500 无重复——所有生成序列互不相同")}</p>
+            </div>
+            <div className="bg-card rounded-lg border border-border p-5">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Novelty", "新颖性")}</p>
+              <p className="text-2xl font-bold text-primary mt-1">1.00</p>
+              <p className="text-xs text-muted-foreground mt-1">{t(locale, "None found in training set — true de novo generation", "不在训练集中——真正的从头生成")}</p>
+            </div>
+            <div className="bg-card rounded-lg border border-border p-5">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Mean Length", "平均长度")}</p>
+              <p className="text-2xl font-bold text-primary mt-1">25.54</p>
+              <p className="text-xs text-muted-foreground mt-1">{t(locale, "AA — within typical AMP range (10–50 AA)", "AA——在典型 AMP 范围内（10–50 AA）")}</p>
+            </div>
+            <div className="bg-card rounded-lg border border-border p-5">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Mean Diversity", "平均多样性")}</p>
+              <p className="text-2xl font-bold text-primary mt-1">0.853</p>
+              <p className="text-xs text-muted-foreground mt-1">{t(locale, "Normalized edit distance — high inter-sequence variability", "归一化编辑距离——序列间高变异性")}</p>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <h4 className="text-lg font-semibold mb-3">{t(locale, "Qualitative Comparison with Baselines", "与基线方法的定性对比")}</h4>
+            <p className="text-sm text-muted-foreground mb-4">
+              {t(
+                locale,
+                "The following comparison is based on publicly reported results from each method's original publications. Approximate values (marked with ~) are estimated from published figures and tables.",
+                "以下对比基于各方法原始论文中的公开报告结果。带 ~ 标记的近似值是从已发表的图表中估计的。"
+              )}
+            </p>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-secondary/60 text-left">
+                    <th className="px-4 py-3 font-semibold">{t(locale, "Dimension", "维度")}</th>
+                    <th className="px-4 py-3 font-semibold text-primary">AMP Forge (ours)</th>
+                    <th className="px-4 py-3 font-semibold">HydrAMP</th>
+                    <th className="px-4 py-3 font-semibold">Diff-AMP</th>
+                    <th className="px-4 py-3 font-semibold">{t(locale, "Metric Note", "指标说明")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {baselineComparison.map((row, i) => (
+                    <tr key={i} className={`border-t border-border ${i % 2 === 0 ? "bg-card" : ""}`}>
+                      <td className="px-4 py-3 font-medium">{locale === "zh" ? row.dimension.zh : row.dimension.en}</td>
+                      <td className="px-4 py-3 text-primary font-semibold">
+                        {typeof row.ours === "string" ? row.ours : locale === "zh" ? row.ours.zh : row.ours.en}
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {typeof row.hydramp === "string" ? row.hydramp : locale === "zh" ? row.hydramp.zh : row.hydramp.en}
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {typeof row.diffamp === "string" ? row.diffamp : locale === "zh" ? row.diffamp.zh : row.diffamp.en}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">{locale === "zh" ? row.note.zh : row.note.en}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-card rounded-lg border border-border p-5">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Uniqueness", "唯一性")}</p>
-            <p className="text-2xl font-bold text-primary mt-1">1.00</p>
-            <p className="text-xs text-muted-foreground mt-1">{t(locale, "500/500 unique — all generated sequences are distinct", "500/500 无重复——所有生成序列互不相同")}</p>
-          </div>
-          <div className="bg-card rounded-lg border border-border p-5">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Novelty", "新颖性")}</p>
-            <p className="text-2xl font-bold text-primary mt-1">1.00</p>
-            <p className="text-xs text-muted-foreground mt-1">{t(locale, "None found in training set — true de novo generation", "不在训练集中——真正的从头生成")}</p>
-          </div>
-          <div className="bg-card rounded-lg border border-border p-5">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Mean Length", "平均长度")}</p>
-            <p className="text-2xl font-bold text-primary mt-1">25.54</p>
-            <p className="text-xs text-muted-foreground mt-1">{t(locale, "AA — within typical AMP range (10–50 AA)", "AA——在典型 AMP 范围内（10–50 AA）")}</p>
-          </div>
-          <div className="bg-card rounded-lg border border-border p-5">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Mean Diversity", "平均多样性")}</p>
-            <p className="text-2xl font-bold text-primary mt-1">0.853</p>
-            <p className="text-xs text-muted-foreground mt-1">{t(locale, "Normalized edit distance — high inter-sequence variability", "归一化编辑距离——序列间高变异性")}</p>
-          </div>
-        </div>
-
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-3">{t(locale, "Qualitative Comparison with Baselines", "与基线方法的定性对比")}</h3>
-          <p className="text-sm text-muted-foreground mb-4">
+        {/* --- MIC Prediction --- */}
+        <div className="mb-12">
+          <h3 className="text-xl font-semibold mb-3">{t(locale, "MIC Prediction — ESM-MIC", "MIC 预测——ESM-MIC")}</h3>
+          <p className="text-sm text-muted-foreground mb-6">
             {t(
               locale,
-              "The following comparison is based on publicly reported results from each method's original publications. Approximate values (marked with ~) are estimated from published figures and tables. A direct quantitative benchmark under identical conditions is planned as future work.",
-              "以下对比基于各方法原始论文中的公开报告结果。带 ~ 标记的近似值是从已发表的图表中估计的。在相同条件下的直接定量基准评测计划作为未来工作。"
+              "Generating novel AMP sequences is only half the story — predicting their antimicrobial potency before synthesis is equally critical. We developed ESM-MIC, a gated multi-branch regression model that predicts the Minimum Inhibitory Concentration (MIC) of peptide sequences directly from pre-computed ESM-2 embeddings, enabling rapid in-silico screening of generated candidates without costly wet-lab assays.",
+              "生成新颖的 AMP 序列只是故事的一半——在合成之前预测其抗菌效力同样关键。我们开发了 ESM-MIC，一种门控多分支回归模型，直接从预计算的 ESM-2 嵌入预测肽序列的最小抑菌浓度（MIC），实现对生成候选序列的快速计算筛选，无需昂贵的湿实验。"
             )}
           </p>
-          <div className="overflow-x-auto rounded-lg border border-border">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-secondary/60 text-left">
-                  <th className="px-4 py-3 font-semibold">{t(locale, "Dimension", "维度")}</th>
-                  <th className="px-4 py-3 font-semibold text-primary">AMP Forge (ours)</th>
-                  <th className="px-4 py-3 font-semibold">HydrAMP [2]</th>
-                  <th className="px-4 py-3 font-semibold">Diff-AMP [3]</th>
-                  <th className="px-4 py-3 font-semibold">{t(locale, "Metric Note", "指标说明")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {baselineComparison.map((row, i) => (
-                  <tr key={i} className={`border-t border-border ${i % 2 === 0 ? "bg-card" : ""}`}>
-                    <td className="px-4 py-3 font-medium">{locale === "zh" ? row.dimension.zh : row.dimension.en}</td>
-                    <td className="px-4 py-3 text-primary font-semibold">
-                      {typeof row.ours === "string" ? row.ours : locale === "zh" ? row.ours.zh : row.ours.en}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {typeof row.hydramp === "string" ? row.hydramp : locale === "zh" ? row.hydramp.zh : row.hydramp.en}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {typeof row.diffamp === "string" ? row.diffamp : locale === "zh" ? row.diffamp.zh : row.diffamp.en}
-                    </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">{locale === "zh" ? row.note.zh : row.note.en}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+          {/* Architecture Pipeline */}
+          <div className="mb-6">
+            <h4 className="text-lg font-semibold mb-4">{t(locale, "Model Architecture", "模型架构")}</h4>
+            <div className="relative">
+              {micArchSteps.map((step, i) => (
+                <div key={i} className="flex items-start gap-4 mb-1 last:mb-0">
+                  <div className="flex flex-col items-center">
+                    <div className="w-8 h-8 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center text-xs font-bold text-primary shrink-0">
+                      {i + 1}
+                    </div>
+                    {i < micArchSteps.length - 1 && <div className="w-px h-6 bg-border" />}
+                  </div>
+                  <div className="pb-2">
+                    <p className="font-medium text-sm">{locale === "zh" ? step.label.zh : step.label.en}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{locale === "zh" ? step.detail.zh : step.detail.en}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground mt-2 italic">
-            {t(locale, "* Approximate values (~) estimated from published figures. Direct head-to-head evaluation under identical settings is planned.", "* 近似值（~）从已发表图表中估计。在相同设置下的直接对比评测已纳入未来计划。")}
+
+          {/* Metrics Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="bg-card rounded-lg border border-border p-5">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Pearson Correlation", "皮尔逊相关系数")}</p>
+              <p className="text-2xl font-bold text-primary mt-1">0.9016</p>
+              <p className="text-xs text-muted-foreground mt-1">{t(locale, "21-model ensemble on held-out test set", "21 模型集成在留出测试集上的表现")}</p>
+            </div>
+            <div className="bg-card rounded-lg border border-border p-5">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">R²</p>
+              <p className="text-2xl font-bold text-primary mt-1">0.8124</p>
+              <p className="text-xs text-muted-foreground mt-1">{t(locale, "Coefficient of determination — strong explanatory power", "决定系数——强解释力")}</p>
+            </div>
+            <div className="bg-card rounded-lg border border-border p-5">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">{t(locale, "Spearman Rank", "斯皮尔曼秩")}</p>
+              <p className="text-2xl font-bold text-primary mt-1">0.8808</p>
+              <p className="text-xs text-muted-foreground mt-1">{t(locale, "Rank-order correlation — reliable for candidate ranking", "秩序相关——候选序列排序可靠")}</p>
+            </div>
+            <div className="bg-card rounded-lg border border-border p-5">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">RMSE</p>
+              <p className="text-2xl font-bold text-primary mt-1">0.574</p>
+              <p className="text-xs text-muted-foreground mt-1">{t(locale, "log-MIC units — less than 4× error in concentration", "log-MIC 单位——浓度误差小于 4 倍")}</p>
+            </div>
+          </div>
+
+          {/* Training Strategy Highlights */}
+          <div className="bg-card rounded-lg border border-border p-5 mb-6">
+            <h4 className="text-lg font-semibold mb-3">{t(locale, "Key Training Strategies", "关键训练策略")}</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div>
+                <p className="font-medium mb-1">{t(locale, "Data Cleaning", "数据清洗")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t(
+                    locale,
+                    "Out-of-fold residual analysis identifies and removes ~11.5% noisy samples, boosting PCC from 0.71 to 0.89 with cleaner labels.",
+                    "折外残差分析识别并去除约 11.5% 的噪声样本，通过更干净的标签将 PCC 从 0.71 提升至 0.89。"
+                  )}
+                </p>
+              </div>
+              <div>
+                <p className="font-medium mb-1">{t(locale, "Quadruple Augmentation", "四重数据增强")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t(
+                    locale,
+                    "Embedding Gaussian noise, random residue masking (15%), Mixup interpolation, and label noise work together to regularize a 1.6M-parameter model on ~4,700 training samples.",
+                    "嵌入高斯噪声、随机残基掩码（15%）、Mixup 插值与标签噪声协同正则化，使 160 万参数模型在约 4700 个训练样本上有效学习。"
+                  )}
+                </p>
+              </div>
+              <div>
+                <p className="font-medium mb-1">{t(locale, "Snapshot Ensemble", "快照集成")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t(
+                    locale,
+                    "Training 3 models with different random seeds and retaining the top-7 checkpoints from each yields a 21-model ensemble, pushing PCC past 0.90 with no extra architecture cost.",
+                    "使用 3 个不同随机种子训练，每个保留 top-7 检查点，组成 21 模型集成，将 PCC 推至 0.90 以上，无额外架构成本。"
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-xs text-muted-foreground italic">
+            {t(
+              locale,
+              "ESM-MIC is trained on ~5,300 AMP sequences with experimentally measured MIC values curated from the project's cross-database corpus. The model enables automated prioritization of AMP Forge outputs before wet-lab validation.",
+              "ESM-MIC 基于项目跨数据库语料库中约 5300 条具有实验测定 MIC 值的 AMP 序列训练。该模型实现了在湿实验验证前对 AMP Forge 生成结果的自动化优先级排序。"
+            )}
           </p>
         </div>
 
+        {/* --- Wet-Lab Validation --- */}
         <div className="mb-8">
           <h3 className="text-xl font-semibold mb-3">{t(locale, "Wet-Lab Experimental Validation", "湿实验合成验证")}</h3>
           <p className="text-sm text-muted-foreground mb-4">

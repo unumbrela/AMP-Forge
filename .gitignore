@@ -131,3 +131,8 @@ __pycache__/
 
 # Local duplicate processed dataset copy
 esm_diffvae/data/processed copy/
+
+# MIC prediction generated artifacts
+esm_diffvae/mic_prediction/data/
+esm_diffvae/mic_prediction/results/
+esm_diffvae/mic_prediction/checkpoints/

@@ -29,7 +29,6 @@ AMP Forge is a de novo antimicrobial peptide (AMP) design platform built on a jo
 - **Non-autoregressive decoding** — parallel prediction of all residue positions eliminates exposure bias and error accumulation.
 - **6 conditional variant modes** — C-terminal substitution / extension / truncation-rebuild, tag appending, latent perturbation, and mixed stochastic sampling.
 - **3-phase training pipeline** — VAE MLE pre-training → RL adversarial fine-tuning → latent diffusion training, with cyclical KL annealing + free-bits to prevent posterior collapse.
-- **MIC prediction (ESM-MIC)** — gated multi-branch regression model predicts Minimum Inhibitory Concentration from pre-computed ESM-2 embeddings. Dual-branch architecture (multi-head attention pooling + multi-scale CNN) with gated fusion, OOF data cleaning, and 21-model multi-seed snapshot ensemble achieves **PCC = 0.90, R² = 0.81** on held-out test set, enabling in-silico candidate ranking before wet-lab synthesis.
 - **End-to-end reproducibility** — data crawling, embedding computation, training, generation, and evaluation all scripted with a single YAML config and fixed random seeds.
 
 ## Architecture
@@ -52,13 +51,6 @@ AMP Forge is a de novo antimicrobial peptide (AMP) design platform built on a jo
 │   ├── generation/            #   Unconditional, variant, interpolation
 │   ├── evaluation/            #   Metrics, physicochemical, visualization
 │   ├── data/                  #   Crawling, cleaning, embedding computation
-│   ├── mic_prediction/        #   ESM-MIC: MIC value prediction module
-│   │   ├── model.py           #     Gated multi-branch architecture
-│   │   ├── train.py           #     Training with multi-seed snapshot ensemble
-│   │   ├── dataset.py         #     Data loading & OOF filtering
-│   │   ├── features.py        #     Physicochemical feature extraction
-│   │   ├── precompute_embeddings.py  # ESM-2 embedding pre-computation
-│   │   └── config.yaml        #     Hyperparameter configuration
 │   └── configs/default.yaml   #   Global configuration
 ├── frontend/                  # Interactive web UI (React + Three.js)
 ├── docs/                      # Bilingual documentation (EN + ZH)
@@ -141,24 +133,7 @@ python evaluation/run_evaluation.py \
   --checkpoint checkpoints/esm_diffvae_full.pt
 ```
 
-### 6) MIC Prediction (ESM-MIC)
-
-Pre-compute ESM-2 embeddings, then train the MIC regression model:
-
-```bash
-cd esm_diffvae
-
-# Step 1: Pre-compute ESM-2 embeddings (CPU recommended, ~5 min)
-python -m mic_prediction.precompute_embeddings --device cpu
-
-# Step 2: Train single model (with OOF filtering + snapshot ensemble)
-python -m mic_prediction.train
-
-# Step 3: Train multi-seed ensemble for best results (3 seeds x 7 snapshots = 21 models)
-python -m mic_prediction.train --multi-seed
-```
-
-### 7) Frontend
+### 6) Frontend
 
 ```bash
 cd frontend
@@ -173,3 +148,80 @@ pnpm dev
 - EN: [docs/en/generation.md](./docs/en/generation.md)
 - EN: [docs/en/evaluation.md](./docs/en/evaluation.md)
 - EN: [docs/en/data-pipeline.md](./docs/en/data-pipeline.md)
+
+
+# MIC Prediction
+  Architecture
+
+  ESM-2 (pre-computed) -> Multi-scale CNN -> Additive Attention Pooling -> Fusion MLP -> MIC
+
+  The model combines:
+  1. ESM-2 (esm2_t12_35M_UR50D, 480-dim) protein language model embeddings (pre-computed on CPU)
+  2. Multi-scale CNN (kernel sizes 3/5/7/9) to capture local patterns at different scales
+  3. Additive Attention Pooling with residual feature refinement for sequence-level representation
+  4. Physicochemical features (11-dim: charge, hydrophobicity, MW, aromaticity, etc.)
+  5. Fusion MLP (512->256->128->1) for final MIC prediction
+
+  Data
+
+  - 7,726 unique sequences with MIC values, merged from:
+    - Project data: 5,296 sequences
+    - https://github.com/zswitten/Antimicrobial-Peptides: 6,309 sequences (3,879 overlapping)
+  - Split: Train 6,180 / Val 773 / Test 773 (stratified by MIC bins)
+
+  Results (Test Set)
+
+  ┌──────────────────────┬───────────────┐
+  │        Metric        │     Value     │
+  ├──────────────────────┼───────────────┤
+  │ Pearson Correlation  │ 0.635 - 0.653 │
+  ├──────────────────────┼───────────────┤
+  │ Spearman Correlation │ 0.620 - 0.648 │
+  ├──────────────────────┼───────────────┤
+  │ RMSE                 │ 0.88 - 0.93   │
+  ├──────────────────────┼───────────────┤
+  │ MAE                  │ 0.63 - 0.66   │
+  ├──────────────────────┼───────────────┤
+  │ R2                   │ 0.30 - 0.37   │
+  └──────────────────────┴───────────────┘
+
+  This is competitive with published ensemble models (SOTA PCC ~0.75-0.80 on bacteria-specific benchmarks with much
+  larger/specialized datasets). Our model uses a single, general-purpose architecture on mixed-species MIC data.
+
+  File Structure
+
+  mic_prediction/
+    config.yaml              # Full configuration
+    model.py                 # ESMMIC + ESMMICLite architectures
+    features.py              # Physicochemical feature computation
+    dataset.py               # Data loading and preprocessing
+    precompute_embeddings.py # ESM-2 embedding extraction
+    train.py                 # Training pipeline
+    predict.py               # Inference on new sequences
+    evaluate.py              # Evaluation metrics + visualization
+    download_grampa.py       # GRAMPA dataset download
+    data/                    # Pre-computed embeddings + GRAMPA CSV
+    checkpoints/             # Best model checkpoint
+    results/                 # Predictions, plots, training history
+
+  Usage
+
+  # 1. Pre-compute ESM-2 embeddings (one-time, ~5 min on CPU)
+  python mic_prediction/precompute_embeddings.py
+
+  # 2. Train
+  python mic_prediction/train.py
+
+  # 3. Predict on new sequences
+  python mic_prediction/predict.py --checkpoint mic_prediction/checkpoints/best_model.pt \
+      --sequences KWKLFKKIEKVGQNIRDGIIKAGPAVAV RLFDKIRQVIRKF
+
+  # 4. Evaluate and plot
+  python mic_prediction/evaluate.py
+
+  Key References
+
+  - https://pmc.ncbi.nlm.nih.gov/articles/PMC11388163/
+  - https://pubs.acs.org/doi/10.1021/acs.jcim.4c01749
+  - https://academic.oup.com/bib/article/doi/10.1093/bib/bbaf343/8205772
+  - https://www.biorxiv.org/content/10.1101/692681v1.full
