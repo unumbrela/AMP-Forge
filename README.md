@@ -143,7 +143,7 @@ python evaluation/run_evaluation.py \
 
 ### 6) MIC Prediction (ESM-MIC)
 
-Pre-compute ESM-2 embeddings, then train the MIC regression model:
+Pre-compute ESM-2 embeddings, then train the MIC regression model
 
 ```bash
 cd esm_diffvae
